@@ -193,4 +193,51 @@ class TaskwarriorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('bar1', $result->getDescription());
     }
+
+    public function testDue()
+    {
+        $date = $this->createDateTime('1989-01-08 11:12:13');
+
+        $task1 = new Task();
+        $task1->setDescription('foo1');
+        $task1->setDue($date);
+
+        $this->taskwarrior->save($task1);
+        $this->taskwarrior->clear();
+
+        $task2 = $this->taskwarrior->find($task1->getUuid());
+        $this->assertEquals($date, $task2->getDue());
+
+        $newDate = $this->createDateTime('2002-02-20 11:12:13');
+
+        $task2->setDue($newDate);
+
+        $this->taskwarrior->save($task2);
+        $this->taskwarrior->clear();
+
+        $task3 = $this->taskwarrior->find($task1->getUuid());
+        $this->assertEquals($newDate, $task3->getDue());
+    }
+
+    public function testUrgency()
+    {
+        $date = $this->createDateTime('1989-01-08 11:12:13');
+
+        $task1 = new Task();
+        $task1->setDescription('foo1');
+        $task1->setDue($date);
+
+        $this->taskwarrior->save($task1);
+
+        $this->assertEquals(12, $task1->getUrgency());
+    }
+
+    /**
+     * @param string $string
+     * @return \DateTime
+     */
+    private function createDateTime($string = 'now')
+    {
+        return new \DateTime($string, new \DateTimeZone('UTC'));
+    }
 }

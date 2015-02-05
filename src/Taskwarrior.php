@@ -116,7 +116,7 @@ class Taskwarrior
         }
 
         $this->command('delete', $task->getUuid());
-        $task->setStatus(Task::STATUS_DELETED);
+        $this->update($task);
     }
 
     /**
@@ -129,7 +129,7 @@ class Taskwarrior
         }
 
         $this->command('done', $task->getUuid());
-        $task->setStatus(Task::STATUS_COMPLETED);
+        $this->update($task);
     }
 
     /**
@@ -167,13 +167,7 @@ class Taskwarrior
      */
     private function export($filter = '')
     {
-        $tasks = array();
-
         $json = $this->command('export', $filter);
-
-        if (!$json) {
-            return $tasks;
-        }
 
         $serializer = SerializerBuilder::create()
             ->addDefaultHandlers()
@@ -226,7 +220,7 @@ class Taskwarrior
         $json = $this->serializeTask($task);
         $uuid = $this->import($json);
 
-        $task->setUuid($uuid);
+        $this->setValue($task, 'uuid', $uuid);
         $this->tasks[$uuid] = $task;
 
         $this->update($task);
@@ -237,9 +231,16 @@ class Taskwarrior
      */
     private function edit(Task $task)
     {
-        $modify  = Modify::createFromTask($task);
-        $options = $this->modifyOptions($modify);
+        $options = [];
+
+        if ($task->getDue()) {
+            $options[] = 'due:' . $task->getDue()->format('Ymd\THis\Z');
+        }
+
+        $options[] = $task->getDescription();
+
         $this->command('modify', $task->getUuid(), $options);
+        $this->update($task);
     }
 
     /**
@@ -247,7 +248,10 @@ class Taskwarrior
      */
     private function update(Task $task)
     {
-        // todo
+        $clean = $this->export($task->getUuid())[0];
+
+        $this->setValue($task, 'urgency', $clean->getUrgency());
+        $this->setValue($task, 'status', $clean->getStatus());
     }
 
     /**
@@ -284,15 +288,15 @@ class Taskwarrior
     }
 
     /**
-     * @param Modify $modify
-     * @return array
+     * @param Task $task
+     * @param string $attr
+     * @param mixed $value
      */
-    private function modifyOptions(Modify $modify)
+    private function setValue(Task $task, $attr, $value)
     {
-        $array = [];
-
-        $array[] = $modify->getDescription();
-
-        return $array;
+        $reflectionClass = new \ReflectionClass('DavidBadura\Taskwarrior\Task');
+        $prop = $reflectionClass->getProperty($attr);
+        $prop->setAccessible(true);
+        $prop->setValue($task, $value);
     }
 }

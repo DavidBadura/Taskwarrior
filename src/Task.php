@@ -9,10 +9,10 @@ use JMS\Serializer\Annotation as JMS;
  */
 class Task
 {
-    const STATUS_PENDING = 'pending';
+    const STATUS_PENDING   = 'pending';
     const STATUS_COMPLETED = 'completed';
-    const STATUS_DELETED = 'deleted';
-    const STATUS_WAITING = 'waiting';
+    const STATUS_DELETED   = 'deleted';
+    const STATUS_WAITING   = 'waiting';
 
     /**
      * @var string
@@ -29,6 +29,27 @@ class Task
     private $description;
 
     /**
+     * @var \DateTime
+     *
+     * @JMS\Type(name="DateTime<'Ymd\THis\Z'>")
+     */
+    private $due;
+
+    /**
+     * @var float
+     *
+     * @JMS\Type(name="float")
+     */
+    private $urgency;
+
+    /**
+     * @var \DateTime
+     *
+     * @JMS\Type(name="DateTime<'Ymd\THis\Z'>")
+     */
+    private $entry;
+
+    /**
      * @var string
      *
      * @JMS\Type(name="string")
@@ -40,7 +61,9 @@ class Task
      */
     public function __construct()
     {
-        $this->status = self::STATUS_PENDING;
+        $this->urgency = 0;
+        $this->entry   = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->status  = self::STATUS_PENDING;
     }
 
     /**
@@ -49,14 +72,6 @@ class Task
     public function getUuid()
     {
         return $this->uuid;
-    }
-
-    /**
-     * @param string $uuid
-     */
-    public function setUuid($uuid)
-    {
-        $this->uuid = $uuid;
     }
 
     /**
@@ -76,19 +91,43 @@ class Task
     }
 
     /**
+     * @return \DateTime
+     */
+    public function getDue()
+    {
+        return $this->due;
+    }
+
+    /**
+     * @param \DateTime $due
+     */
+    public function setDue(\DateTime $due = null)
+    {
+        $this->due = $due;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getEntry()
+    {
+        return $this->entry;
+    }
+
+    /**
+     * @return float
+     */
+    public function getUrgency()
+    {
+        return $this->urgency;
+    }
+
+    /**
      * @return string
      */
     public function getStatus()
     {
         return $this->status;
-    }
-
-    /**
-     * @param string $status
-     */
-    public function setStatus($status)
-    {
-        $this->status = $status;
     }
 
     /**
