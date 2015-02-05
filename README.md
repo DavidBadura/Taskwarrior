@@ -1,6 +1,6 @@
 # Taskwarrior
 
-[![Build Status](https://travis-ci.org/DavidBadura/Taskwarrior.svg)](https://travis-ci.org/DavidBadura/Taskwarrior)
+[![Build Status](https://travis-ci.org/DavidBadura/Taskwarrior.svg?branch=master)](https://travis-ci.org/DavidBadura/Taskwarrior)
 
 ```php
 $tw = new \DavidBadura\Taskwarrior\Taskwarrior();
