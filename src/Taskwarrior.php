@@ -3,9 +3,8 @@
 namespace DavidBadura\Taskwarrior;
 
 use JMS\Serializer\SerializerBuilder;
-use Symfony\Component\Process\ProcessBuilder;
 use Symfony\Component\Filesystem\Filesystem;
-
+use Symfony\Component\Process\ProcessBuilder;
 
 /**
  * @author David Badura <d.a.badura@gmail.com>
@@ -25,7 +24,7 @@ class Taskwarrior
     /**
      * @param string $taskrc
      * @param string $taskData
-     * @param array  $rcOptions
+     * @param array $rcOptions
      */
     public function __construct($taskrc = '~/.taskrc', $taskData = '~/.task', $rcOptions = [])
     {
@@ -99,11 +98,25 @@ class Taskwarrior
     }
 
     /**
+     * @param string $filter
+     * @return Task[]
+     */
+    public function filterPending($filter = '')
+    {
+        return $this->filter($filter . ' status:pending');
+    }
+
+    /**
      * @param Task $task
      */
     public function delete(Task $task)
     {
-        // todo
+        if (!$task->getUuid()) {
+            return;
+        }
+
+        $this->command('delete', $task->getUuid());
+        $task->setStatus(Task::STATUS_DELETED);
     }
 
     /**
@@ -111,7 +124,12 @@ class Taskwarrior
      */
     public function done(Task $task)
     {
-        // todo
+        if (!$task->getUuid()) {
+            return;
+        }
+
+        $this->command('done', $task->getUuid());
+        $task->setStatus(Task::STATUS_COMPLETED);
     }
 
     /**
@@ -167,7 +185,7 @@ class Taskwarrior
     /**
      * @param string $command
      * @param string $filter
-     * @param array  $options
+     * @param array $options
      * @return string
      * @throws TaskwarriorException
      */

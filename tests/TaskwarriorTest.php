@@ -116,6 +116,65 @@ class TaskwarriorTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(2, $this->taskwarrior->filter());
     }
 
+    public function testPending()
+    {
+        $task1 = new Task();
+        $task1->setDescription('foo1');
+
+        $this->taskwarrior->save($task1);
+
+        $this->assertEquals(Task::STATUS_PENDING, $task1->getStatus());
+        $this->assertTrue($task1->isPending());
+
+        $this->taskwarrior->clear();
+        $result = $this->taskwarrior->find($task1->getUuid());
+
+        $this->assertEquals(Task::STATUS_PENDING, $result->getStatus());
+        $this->assertTrue($result->isPending());
+
+        $this->assertCount(1, $this->taskwarrior->filterPending());
+    }
+
+    public function testDelete()
+    {
+        $task1 = new Task();
+        $task1->setDescription('foo1');
+
+        $this->assertCount(0, $this->taskwarrior->filter());
+
+        $this->taskwarrior->save($task1);
+        $this->assertCount(1, $this->taskwarrior->filter());
+        $this->assertCount(1, $this->taskwarrior->filterPending());
+        $this->assertFalse($task1->isDeleted());
+        $this->assertEquals(Task::STATUS_PENDING, $task1->getStatus());
+
+        $this->taskwarrior->delete($task1);
+        $this->assertCount(1, $this->taskwarrior->filter());
+        $this->assertCount(0, $this->taskwarrior->filterPending());
+        $this->assertTrue($task1->isDeleted());
+        $this->assertEquals(Task::STATUS_DELETED, $task1->getStatus());
+    }
+
+    public function testCompleted()
+    {
+        $task1 = new Task();
+        $task1->setDescription('foo1');
+
+        $this->assertCount(0, $this->taskwarrior->filter());
+
+        $this->taskwarrior->save($task1);
+        $this->assertCount(1, $this->taskwarrior->filter());
+        $this->assertCount(1, $this->taskwarrior->filterPending());
+        $this->assertFalse($task1->isCompleted());
+        $this->assertEquals(Task::STATUS_PENDING, $task1->getStatus());
+
+        $this->taskwarrior->done($task1);
+        $this->assertCount(1, $this->taskwarrior->filter());
+        $this->assertCount(0, $this->taskwarrior->filterPending());
+        $this->assertTrue($task1->isCompleted());
+        $this->assertEquals(Task::STATUS_COMPLETED, $task1->getStatus());
+    }
+
     public function testModifyDescription()
     {
         $task1 = new Task();
