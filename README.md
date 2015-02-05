@@ -1,5 +1,7 @@
 # Taskwarrior
 
+[![Build Status](https://travis-ci.org/DavidBadura/Taskwarrior.svg)](https://travis-ci.org/DavidBadura/Taskwarrior)
+
 ```php
 $tw = new \DavidBadura\Taskwarrior\Taskwarrior();
 
