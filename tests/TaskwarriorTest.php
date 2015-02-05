@@ -217,19 +217,56 @@ class TaskwarriorTest extends \PHPUnit_Framework_TestCase
 
         $task3 = $this->taskwarrior->find($task1->getUuid());
         $this->assertEquals($newDate, $task3->getDue());
+
+        $task2->setDue(null);
+
+        $this->taskwarrior->save($task2);
+        $this->taskwarrior->clear();
+
+        $task3 = $this->taskwarrior->find($task1->getUuid());
+        $this->assertNull($task3->getDue());
     }
 
     public function testUrgency()
     {
-        $date = $this->createDateTime('1989-01-08 11:12:13');
-
         $task1 = new Task();
         $task1->setDescription('foo1');
-        $task1->setDue($date);
+        $task1->setDue($this->createDateTime('1989-01-08 11:12:13'));
 
         $this->taskwarrior->save($task1);
 
         $this->assertEquals(12, $task1->getUrgency());
+
+        $task1->setDue(null);
+
+        $this->taskwarrior->save($task1);
+
+        $this->assertEquals(0, $task1->getUrgency());
+    }
+
+    public function testUrgencySort()
+    {
+        $task1 = new Task();
+        $task1->setDescription('foo1');
+
+        $task2 = new Task();
+        $task2->setDescription('foo2');
+        $task2->setDue($this->createDateTime('1989-01-08 11:12:13'));
+
+        $task3 = new Task();
+        $task3->setDescription('foo3');
+
+        $this->taskwarrior->save($task1);
+        $this->taskwarrior->save($task2);
+        $this->taskwarrior->save($task3);
+
+        $this->assertEquals(0, $task1->getUrgency());
+        $this->assertEquals(12, $task2->getUrgency());
+        $this->assertEquals(0, $task3->getUrgency());
+
+        $tasks = $this->taskwarrior->filterPending();
+
+        $this->assertEquals(array($task2, $task1, $task3), $tasks);
     }
 
     /**

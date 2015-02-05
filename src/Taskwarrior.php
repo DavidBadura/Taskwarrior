@@ -103,7 +103,9 @@ class Taskwarrior
      */
     public function filterPending($filter = '')
     {
-        return $this->filter($filter . ' status:pending');
+        $tasks = $this->filter($filter . ' status:pending');
+
+        return $this->sort($tasks);
     }
 
     /**
@@ -235,6 +237,8 @@ class Taskwarrior
 
         if ($task->getDue()) {
             $options[] = 'due:' . $task->getDue()->format('Ymd\THis\Z');
+        } else {
+            $options[] = 'due:';
         }
 
         $options[] = $task->getDescription();
@@ -252,6 +256,23 @@ class Taskwarrior
 
         $this->setValue($task, 'urgency', $clean->getUrgency());
         $this->setValue($task, 'status', $clean->getStatus());
+    }
+
+    /**
+     * @param Task[] $tasks
+     * @return Task[]
+     */
+    private function sort(array $tasks)
+    {
+        usort($tasks, function (Task $a, Task $b) {
+            if(0 != $diff = $b->getUrgency() - $a->getUrgency()) {
+                return $diff;
+            }
+
+            return $a->getEntry() >= $b->getEntry() ? 1 : -1;
+        });
+
+        return $tasks;
     }
 
     /**
@@ -295,7 +316,7 @@ class Taskwarrior
     private function setValue(Task $task, $attr, $value)
     {
         $reflectionClass = new \ReflectionClass('DavidBadura\Taskwarrior\Task');
-        $prop = $reflectionClass->getProperty($attr);
+        $prop            = $reflectionClass->getProperty($attr);
         $prop->setAccessible(true);
         $prop->setValue($task, $value);
     }
