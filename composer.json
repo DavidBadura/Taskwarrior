@@ -1,0 +1,30 @@
+{
+  "name": "davidbadura/taskwarrior",
+  "description": "a php lib for taskwarrior",
+  "keywords": [
+    "task",
+    "taskwarrior"
+  ],
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "David Badura",
+      "email": "d.badura@gmx.de"
+    }
+  ],
+  "require": {
+    "php": ">=5.4",
+    "symfony/process": "~2.3",
+    "jms/serializer": "0.16.*",
+    "symfony/filesystem": "~2.3"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "~4.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "DavidBadura\\Taskwarrior\\": "src"
+    }
+  }
+}
