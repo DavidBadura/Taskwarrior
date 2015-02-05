@@ -33,7 +33,7 @@ class Taskwarrior
             array(
                 'rc:' . $taskrc,
                 'rc.data.location=' . $taskData,
-                'rc.json.array=false',
+                'rc.json.array=true',
                 'rc.confirmation=no',
             ),
             $rcOptions
@@ -157,21 +157,11 @@ class Taskwarrior
             return $tasks;
         }
 
-        $jsons = explode("\n", $json);
+        $serializer = SerializerBuilder::create()
+            ->addDefaultHandlers()
+            ->build();
 
-        foreach ($jsons as $row) {
-            if (trim($row) == "") {
-                continue;
-            }
-
-            $serializer = SerializerBuilder::create()
-                ->addDefaultHandlers()
-                ->build();
-
-            $tasks[] = $serializer->deserialize($row, 'DavidBadura\Taskwarrior\Task', 'json');
-        }
-
-        return $tasks;
+        return $serializer->deserialize($json, 'array<DavidBadura\Taskwarrior\Task>', 'json');
     }
 
     /**
