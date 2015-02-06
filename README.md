@@ -1,6 +1,8 @@
-# Taskwarrior
+# Taskwarrior PHP lib
 
 [![Build Status](https://travis-ci.org/DavidBadura/Taskwarrior.svg?branch=master)](https://travis-ci.org/DavidBadura/Taskwarrior)
+
+![WOW](http://i.imgur.com/mvSQh0M.gif)
 
 ```php
 $tm = \DavidBadura\Taskwarrior\TaskManager::create();
