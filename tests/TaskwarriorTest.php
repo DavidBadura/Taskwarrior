@@ -68,7 +68,7 @@ class TaskwarriorTest extends \PHPUnit_Framework_TestCase
 
         $this->taskwarrior->save($task);
 
-        $result = $this->taskwarrior->filter($task->getUuid());
+        $result = $this->taskwarrior->filterAll($task->getUuid());
 
         $this->assertSame($task, $result[0]);
     }
@@ -132,7 +132,7 @@ class TaskwarriorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(Task::STATUS_PENDING, $result->getStatus());
         $this->assertTrue($result->isPending());
 
-        $this->assertCount(1, $this->taskwarrior->filterPending());
+        $this->assertCount(1, $this->taskwarrior->filter());
     }
 
     public function testDelete()
@@ -143,14 +143,14 @@ class TaskwarriorTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(0, $this->taskwarrior->filter());
 
         $this->taskwarrior->save($task1);
+        $this->assertCount(1, $this->taskwarrior->filterAll());
         $this->assertCount(1, $this->taskwarrior->filter());
-        $this->assertCount(1, $this->taskwarrior->filterPending());
         $this->assertFalse($task1->isDeleted());
         $this->assertEquals(Task::STATUS_PENDING, $task1->getStatus());
 
         $this->taskwarrior->delete($task1);
-        $this->assertCount(1, $this->taskwarrior->filter());
-        $this->assertCount(0, $this->taskwarrior->filterPending());
+        $this->assertCount(1, $this->taskwarrior->filterAll());
+        $this->assertCount(0, $this->taskwarrior->filter());
         $this->assertTrue($task1->isDeleted());
         $this->assertEquals(Task::STATUS_DELETED, $task1->getStatus());
     }
@@ -163,14 +163,14 @@ class TaskwarriorTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(0, $this->taskwarrior->filter());
 
         $this->taskwarrior->save($task1);
+        $this->assertCount(1, $this->taskwarrior->filterAll());
         $this->assertCount(1, $this->taskwarrior->filter());
-        $this->assertCount(1, $this->taskwarrior->filterPending());
         $this->assertFalse($task1->isCompleted());
         $this->assertEquals(Task::STATUS_PENDING, $task1->getStatus());
 
         $this->taskwarrior->done($task1);
-        $this->assertCount(1, $this->taskwarrior->filter());
-        $this->assertCount(0, $this->taskwarrior->filterPending());
+        $this->assertCount(1, $this->taskwarrior->filterAll());
+        $this->assertCount(0, $this->taskwarrior->filter());
         $this->assertTrue($task1->isCompleted());
         $this->assertEquals(Task::STATUS_COMPLETED, $task1->getStatus());
     }
@@ -264,7 +264,7 @@ class TaskwarriorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(12, $task2->getUrgency());
         $this->assertEquals(0, $task3->getUrgency());
 
-        $tasks = $this->taskwarrior->filterPending();
+        $tasks = $this->taskwarrior->filter();
 
         $this->assertEquals(array($task2, $task1, $task3), $tasks);
     }

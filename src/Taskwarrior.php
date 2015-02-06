@@ -62,7 +62,7 @@ class Taskwarrior
             return $this->tasks[$uuid];
         }
 
-        $tasks = $this->filter($uuid);
+        $tasks = $this->filterAll($uuid);
 
         if (count($tasks) == 0) {
             return null;
@@ -79,7 +79,7 @@ class Taskwarrior
      * @param $filter
      * @return Task[]
      */
-    public function filter($filter = '')
+    public function filterAll($filter = '')
     {
         $result = $this->export($filter);
 
@@ -101,9 +101,9 @@ class Taskwarrior
      * @param string $filter
      * @return Task[]
      */
-    public function filterPending($filter = '')
+    public function filter($filter = '')
     {
-        $tasks = $this->filter($filter . ' status:pending');
+        $tasks = $this->filterAll($filter . ' status:pending');
 
         return $this->sort($tasks);
     }
