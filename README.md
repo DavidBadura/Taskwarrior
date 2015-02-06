@@ -6,7 +6,7 @@
 $tm = \DavidBadura\Taskwarrior\TaskManager::create();
 
 $task = new \DavidBadura\Taskwarrior\Task();
-$task->setDesciption('program this lib');
+$task->setDescription('program this lib');
 $task->setProject('hobby');
 $task->setDue(new \DateTime('tomorrow'));
 
