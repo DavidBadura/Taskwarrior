@@ -373,6 +373,37 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(Task::PRIORITY_HIGH, $task1->getPriority());
     }
 
+    public function testTag()
+    {
+        $task1 = new Task();
+        $task1->setDescription('foo1');
+
+        $this->taskManager->save($task1);
+        $this->taskManager->clear();
+
+        $task1 = $this->taskManager->find($task1->getUuid());
+        $this->assertEmpty($task1->getTags());
+
+        $task1->setTags(array('a', 'b', 'c'));
+        $this->taskManager->save($task1);
+        $this->taskManager->clear();
+
+        $task1 = $this->taskManager->find($task1->getUuid());
+        $this->assertEquals(array('a', 'b', 'c'), $task1->getTags());
+
+        $task1->addTag('d');
+        $task1->removeTag('a');
+
+        $this->taskManager->save($task1);
+        $this->taskManager->clear();
+
+        $task1 = $this->taskManager->find($task1->getUuid());
+        $this->assertEquals(array('b', 'c', 'd'), $task1->getTags());
+        $this->assertCount(0, $this->taskManager->filter('+a'));
+        $this->assertCount(1, $this->taskManager->filter('+b'));
+    }
+
+
     /**
      * @param string $string
      * @return \DateTime

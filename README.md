@@ -5,14 +5,18 @@
 ![WOW](http://i.imgur.com/mvSQh0M.gif)
 
 ```php
-$tm = \DavidBadura\Taskwarrior\TaskManager::create();
+use DavidBadura\Taskwarrior\TaskManager;
+use DavidBadura\Taskwarrior\Task;
 
-$task = new \DavidBadura\Taskwarrior\Task();
+$tm = TaskManager::create();
+
+$task = new Task();
 $task->setDescription('program this lib');
 $task->setProject('hobby');
 $task->setDue(new \DateTime('tomorrow'));
+$task->setPriority(Task::PRIORITY_HIGH);
 
-$task->addTag('next'); // todo :D
+$task->addTag('next');
 
 $tm->save($task);
 

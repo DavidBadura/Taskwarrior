@@ -192,6 +192,7 @@ class TaskManager
                 'description' => $task->getDescription(),
                 'project'     => $task->getProject(),
                 'priority'    => $task->getPriority(),
+                'tags'        => $task->getTags(),
                 'due'         => $task->getDue() ? $task->getDue()->format('Ymd\THis\Z') : null,
             ],
             $task->getUuid()

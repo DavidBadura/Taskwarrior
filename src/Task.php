@@ -14,9 +14,9 @@ class Task
     const STATUS_DELETED   = 'deleted';
     const STATUS_WAITING   = 'waiting';
 
-    const PRIORITY_LOW = 'L';
+    const PRIORITY_LOW    = 'L';
     const PRIORITY_MEDIUM = 'M';
-    const PRIORITY_HIGH = 'H';
+    const PRIORITY_HIGH   = 'H';
 
     /**
      * @var string
@@ -52,6 +52,13 @@ class Task
      * @JMS\Type(name="DateTime<'Ymd\THis\Z'>")
      */
     private $due;
+
+    /**
+     * @var array
+     *
+     * @JMS\Type(name="array<string>")
+     */
+    private $tags;
 
     /**
      * @var float
@@ -154,6 +161,42 @@ class Task
     public function setDue(\DateTime $due = null)
     {
         $this->due = $due;
+    }
+
+    /**
+     * @return array
+     */
+    public function getTags()
+    {
+        return (array)$this->tags;
+    }
+
+    /**
+     * @param array $tags
+     */
+    public function setTags(array $tags = array())
+    {
+        $this->tags = $tags;
+    }
+
+    /**
+     * @param string $tag
+     */
+    public function addTag($tag)
+    {
+        if (!in_array($tag, $this->tags)) {
+            $this->tags[] = $tag;
+        }
+    }
+
+    /**
+     * @param string $tag
+     */
+    public function removeTag($tag)
+    {
+        if (false !== $key = array_search($tag, $this->tags)) {
+            unset($this->tags[$key]);
+        }
     }
 
     /**

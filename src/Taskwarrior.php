@@ -70,6 +70,14 @@ class Taskwarrior
             $options[] = 'priority:' . $params['priority'];
         }
 
+        if (array_key_exists('tags', $params)) {
+            if (is_array($params['tags'])) {
+                $options[] = 'tags:' . implode(',', $params['tags']);
+            } else {
+                $options[] = 'tags:' . $params['tags'];
+            }
+        }
+
         if (array_key_exists('description', $params)) {
             $options[] = $params['description'];
         }
