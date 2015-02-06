@@ -6,9 +6,13 @@
 $tm = \DavidBadura\Taskwarrior\TaskManager::create();
 
 $task = new \DavidBadura\Taskwarrior\Task();
-$task->addTag('home');
+$task->setDesciption('program this lib');
+$task->setProject('hobby');
+$task->setDue(new \DateTime('tomorrow'));
+
+$task->addTag('next'); // todo :D
 
 $tm->save($task);
 
-$tasks = $tm->filter('+home');
+$tasks = $tm->filter('project:hobby');
 ```

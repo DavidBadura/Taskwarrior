@@ -51,6 +51,40 @@ class Taskwarrior
     }
 
     /**
+     * @param array $params
+     * @param string|array  $filter
+     */
+    public function modify(array $params, $filter = null)
+    {
+        $options = [];
+
+        if (array_key_exists('due', $params)) {
+            $options[] = 'due:' . $params['due'];
+        }
+
+        if (array_key_exists('project', $params)) {
+            $options[] = 'project:' . $params['project'];
+        }
+
+        if (array_key_exists('description', $params)) {
+            $options[] = $params['description'];
+        }
+
+        $this->command('modify', $filter, $options);
+    }
+
+    /**
+     * @return array
+     * @throws TaskwarriorException
+     */
+    public function projects()
+    {
+        $result = $this->command('_project');
+
+        return array_filter(explode("\n", $result), 'strlen');
+    }
+
+    /**
      * @param $json
      * @return string
      * @throws TaskwarriorException
@@ -63,6 +97,8 @@ class Taskwarrior
         $fs->dumpFile($file, $json);
 
         $output = $this->command('import', $file);
+
+        $fs->remove($file);
 
         if (!preg_match('/([0-9a-f]{8}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{12})/', $output, $matches)) {
             throw new TaskwarriorException();
@@ -121,6 +157,15 @@ class Taskwarrior
         }
 
         return $process->getOutput();
+    }
+
+    /**
+     * @return string
+     * @throws TaskwarriorException
+     */
+    public function version()
+    {
+        return $this->command('_version');
     }
 
     /**

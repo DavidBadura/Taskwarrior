@@ -29,6 +29,13 @@ class Task
     private $description;
 
     /**
+     * @var string
+     *
+     * @JMS\Type(name="string")
+     */
+    private $project;
+
+    /**
      * @var \DateTime
      *
      * @JMS\Type(name="DateTime<'Ymd\THis\Z'>")
@@ -88,6 +95,22 @@ class Task
     public function setDescription($description)
     {
         $this->description = $description;
+    }
+
+    /**
+     * @return string
+     */
+    public function getProject()
+    {
+        return $this->project;
+    }
+
+    /**
+     * @param string $project
+     */
+    public function setProject($project)
+    {
+        $this->project = $project;
     }
 
     /**

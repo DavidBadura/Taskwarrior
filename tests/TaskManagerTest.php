@@ -26,6 +26,7 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
     {
         $this->taskwarrior = new Taskwarrior(__DIR__ . '/.taskrc', __DIR__ . '/.task');
         $this->taskManager = new TaskManager($this->taskwarrior);
+        $this->taskwarrior->version(); // to initialise
     }
 
     public function tearDown()
@@ -54,6 +55,15 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $result = $this->taskManager->find($task->getUuid());
 
         $this->assertEquals($task, $result);
+    }
+
+    public function testSaveTaskWithoutDescription()
+    {
+        $this->setExpectedException('DavidBadura\Taskwarrior\TaskwarriorException');
+
+        $task = new Task();
+
+        $this->taskManager->save($task);
     }
 
     public function testFindFromCache()
@@ -288,6 +298,57 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $tasks = $this->taskManager->filter();
 
         $this->assertEquals(array($task2, $task1, $task3), $tasks);
+    }
+
+    public function testProject()
+    {
+        $task1 = new Task();
+        $task1->setDescription('foo1');
+        $task1->setProject('home');
+
+        $task2 = new Task();
+        $task2->setDescription('foo2');
+        $task2->setProject('office');
+
+        $this->taskManager->save($task1);
+        $this->taskManager->save($task2);
+
+        $this->taskManager->clear();
+
+        $task1 = $this->taskManager->find($task1->getUuid());
+        $task2 = $this->taskManager->find($task2->getUuid());
+
+        $this->assertEquals('home', $task1->getProject());
+        $this->assertEquals('office', $task2->getProject());
+
+        $this->assertCount(2, $this->taskManager->filter());
+        $this->assertCount(1, $this->taskManager->filter('project:home'));
+        $this->assertCount(1, $this->taskManager->filter('project:office'));
+        $this->assertCount(0, $this->taskManager->filter('project:hobby'));
+
+        $task2->setProject('home');
+        $this->taskManager->save($task2);
+
+        $this->assertCount(2, $this->taskManager->filter());
+        $this->assertCount(2, $this->taskManager->filter('project:home'));
+        $this->assertCount(0, $this->taskManager->filter('project:office'));
+        $this->assertCount(0, $this->taskManager->filter('project:hobby'));
+    }
+
+    public function testProjects()
+    {
+        $task1 = new Task();
+        $task1->setDescription('foo1');
+        $task1->setProject('home');
+
+        $task2 = new Task();
+        $task2->setDescription('foo2');
+        $task2->setProject('office');
+
+        $this->taskManager->save($task1);
+        $this->taskManager->save($task2);
+
+        $this->assertEquals(array('home', 'office'), $this->taskManager->projects());
     }
 
     /**

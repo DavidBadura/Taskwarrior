@@ -129,6 +129,14 @@ class TaskManager
     }
 
     /**
+     * @return array
+     */
+    public function projects()
+    {
+        return $this->taskwarrior->projects();
+    }
+
+    /**
      *
      */
     public function clear()
@@ -171,17 +179,15 @@ class TaskManager
      */
     private function edit(Task $task)
     {
-        $options = [];
+        $this->taskwarrior->modify(
+            [
+                'description' => $task->getDescription(),
+                'project'     => $task->getProject(),
+                'due'         => $task->getDue() ? $task->getDue()->format('Ymd\THis\Z') : null,
+            ],
+            $task->getUuid()
+        );
 
-        if ($task->getDue()) {
-            $options[] = 'due:' . $task->getDue()->format('Ymd\THis\Z');
-        } else {
-            $options[] = 'due:';
-        }
-
-        $options[] = $task->getDescription();
-
-        $this->taskwarrior->command('modify', $task->getUuid(), $options);
         $this->update($task);
     }
 
