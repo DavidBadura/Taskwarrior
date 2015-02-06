@@ -3,22 +3,29 @@
 namespace DavidBadura\Taskwarrior\Test;
 
 use DavidBadura\Taskwarrior\Task;
+use DavidBadura\Taskwarrior\TaskManager;
 use DavidBadura\Taskwarrior\Taskwarrior;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @author David Badura <badura@simplethings.de>
  */
-class TaskwarriorTest extends \PHPUnit_Framework_TestCase
+class TaskManagerTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var Taskwarrior
      */
     protected $taskwarrior;
 
+    /**
+     * @var TaskManager
+     */
+    protected $taskManager;
+
     public function setUp()
     {
         $this->taskwarrior = new Taskwarrior(__DIR__ . '/.taskrc', __DIR__ . '/.task');
+        $this->taskManager = new TaskManager($this->taskwarrior);
     }
 
     public function tearDown()
@@ -30,7 +37,7 @@ class TaskwarriorTest extends \PHPUnit_Framework_TestCase
 
     public function testEmpty()
     {
-        $tasks = $this->taskwarrior->filter();
+        $tasks = $this->taskManager->filter();
         $this->assertEmpty($tasks);
     }
 
@@ -39,12 +46,12 @@ class TaskwarriorTest extends \PHPUnit_Framework_TestCase
         $task = new Task();
         $task->setDescription('foo');
 
-        $this->taskwarrior->save($task);
-        $this->taskwarrior->clear();
+        $this->taskManager->save($task);
+        $this->taskManager->clear();
 
         $this->assertNotEmpty($task->getUuid());
 
-        $result = $this->taskwarrior->find($task->getUuid());
+        $result = $this->taskManager->find($task->getUuid());
 
         $this->assertEquals($task, $result);
     }
@@ -54,9 +61,9 @@ class TaskwarriorTest extends \PHPUnit_Framework_TestCase
         $task = new Task();
         $task->setDescription('foo');
 
-        $this->taskwarrior->save($task);
+        $this->taskManager->save($task);
 
-        $result = $this->taskwarrior->find($task->getUuid());
+        $result = $this->taskManager->find($task->getUuid());
 
         $this->assertSame($task, $result);
     }
@@ -66,16 +73,16 @@ class TaskwarriorTest extends \PHPUnit_Framework_TestCase
         $task = new Task();
         $task->setDescription('foo');
 
-        $this->taskwarrior->save($task);
+        $this->taskManager->save($task);
 
-        $result = $this->taskwarrior->filterAll($task->getUuid());
+        $result = $this->taskManager->filterAll($task->getUuid());
 
         $this->assertSame($task, $result[0]);
     }
 
     public function testDontFind()
     {
-        $task = $this->taskwarrior->find('56464asd46s4adas54da6');
+        $task = $this->taskManager->find('56464asd46s4adas54da6');
         $this->assertNull($task);
     }
 
@@ -84,22 +91,22 @@ class TaskwarriorTest extends \PHPUnit_Framework_TestCase
         $task = new Task();
         $task->setDescription('foo');
 
-        $this->taskwarrior->save($task);
+        $this->taskManager->save($task);
 
         $this->assertNotEmpty($task->getUuid());
         $uuid = $task->getUuid();
 
-        $this->taskwarrior->save($task);
+        $this->taskManager->save($task);
 
         $this->assertEquals($uuid, $task->getUuid());
-        $this->assertCount(1, $this->taskwarrior->filter());
+        $this->assertCount(1, $this->taskManager->filter());
 
-        $this->taskwarrior->clear();
+        $this->taskManager->clear();
 
-        $this->taskwarrior->save($task);
+        $this->taskManager->save($task);
 
         $this->assertEquals($uuid, $task->getUuid());
-        $this->assertCount(1, $this->taskwarrior->filter());
+        $this->assertCount(1, $this->taskManager->filter());
     }
 
     public function testFilterAll()
@@ -110,10 +117,10 @@ class TaskwarriorTest extends \PHPUnit_Framework_TestCase
         $task2 = new Task();
         $task2->setDescription('foo2');
 
-        $this->taskwarrior->save($task1);
-        $this->taskwarrior->save($task2);
+        $this->taskManager->save($task1);
+        $this->taskManager->save($task2);
 
-        $this->assertCount(2, $this->taskwarrior->filter());
+        $this->assertCount(2, $this->taskManager->filter());
     }
 
     public function testMultiFilter()
@@ -124,10 +131,10 @@ class TaskwarriorTest extends \PHPUnit_Framework_TestCase
         $task2 = new Task();
         $task2->setDescription('foo2');
 
-        $this->taskwarrior->save($task1);
-        $this->taskwarrior->save($task2);
+        $this->taskManager->save($task1);
+        $this->taskManager->save($task2);
 
-        $this->assertCount(2, $this->taskwarrior->filter('status:pending')); // todo better test
+        $this->assertCount(2, $this->taskManager->filter('status:pending')); // todo better test
     }
 
     public function testPending()
@@ -135,18 +142,18 @@ class TaskwarriorTest extends \PHPUnit_Framework_TestCase
         $task1 = new Task();
         $task1->setDescription('foo1');
 
-        $this->taskwarrior->save($task1);
+        $this->taskManager->save($task1);
 
         $this->assertEquals(Task::STATUS_PENDING, $task1->getStatus());
         $this->assertTrue($task1->isPending());
 
-        $this->taskwarrior->clear();
-        $result = $this->taskwarrior->find($task1->getUuid());
+        $this->taskManager->clear();
+        $result = $this->taskManager->find($task1->getUuid());
 
         $this->assertEquals(Task::STATUS_PENDING, $result->getStatus());
         $this->assertTrue($result->isPending());
 
-        $this->assertCount(1, $this->taskwarrior->filter());
+        $this->assertCount(1, $this->taskManager->filter());
     }
 
     public function testDelete()
@@ -154,17 +161,17 @@ class TaskwarriorTest extends \PHPUnit_Framework_TestCase
         $task1 = new Task();
         $task1->setDescription('foo1');
 
-        $this->assertCount(0, $this->taskwarrior->filter());
+        $this->assertCount(0, $this->taskManager->filter());
 
-        $this->taskwarrior->save($task1);
-        $this->assertCount(1, $this->taskwarrior->filterAll());
-        $this->assertCount(1, $this->taskwarrior->filter());
+        $this->taskManager->save($task1);
+        $this->assertCount(1, $this->taskManager->filterAll());
+        $this->assertCount(1, $this->taskManager->filter());
         $this->assertFalse($task1->isDeleted());
         $this->assertEquals(Task::STATUS_PENDING, $task1->getStatus());
 
-        $this->taskwarrior->delete($task1);
-        $this->assertCount(1, $this->taskwarrior->filterAll());
-        $this->assertCount(0, $this->taskwarrior->filter());
+        $this->taskManager->delete($task1);
+        $this->assertCount(1, $this->taskManager->filterAll());
+        $this->assertCount(0, $this->taskManager->filter());
         $this->assertTrue($task1->isDeleted());
         $this->assertEquals(Task::STATUS_DELETED, $task1->getStatus());
     }
@@ -174,17 +181,17 @@ class TaskwarriorTest extends \PHPUnit_Framework_TestCase
         $task1 = new Task();
         $task1->setDescription('foo1');
 
-        $this->assertCount(0, $this->taskwarrior->filter());
+        $this->assertCount(0, $this->taskManager->filter());
 
-        $this->taskwarrior->save($task1);
-        $this->assertCount(1, $this->taskwarrior->filterAll());
-        $this->assertCount(1, $this->taskwarrior->filter());
+        $this->taskManager->save($task1);
+        $this->assertCount(1, $this->taskManager->filterAll());
+        $this->assertCount(1, $this->taskManager->filter());
         $this->assertFalse($task1->isCompleted());
         $this->assertEquals(Task::STATUS_PENDING, $task1->getStatus());
 
-        $this->taskwarrior->done($task1);
-        $this->assertCount(1, $this->taskwarrior->filterAll());
-        $this->assertCount(0, $this->taskwarrior->filter());
+        $this->taskManager->done($task1);
+        $this->assertCount(1, $this->taskManager->filterAll());
+        $this->assertCount(0, $this->taskManager->filter());
         $this->assertTrue($task1->isCompleted());
         $this->assertEquals(Task::STATUS_COMPLETED, $task1->getStatus());
     }
@@ -194,16 +201,16 @@ class TaskwarriorTest extends \PHPUnit_Framework_TestCase
         $task1 = new Task();
         $task1->setDescription('foo1');
 
-        $this->taskwarrior->save($task1);
+        $this->taskManager->save($task1);
 
         $this->assertEquals('foo1', $task1->getDescription());
 
         $task1->setDescription('bar1');
-        $this->taskwarrior->save($task1);
+        $this->taskManager->save($task1);
 
-        $this->taskwarrior->clear();
+        $this->taskManager->clear();
 
-        $result = $this->taskwarrior->find($task1->getUuid());
+        $result = $this->taskManager->find($task1->getUuid());
 
         $this->assertEquals('bar1', $result->getDescription());
     }
@@ -216,28 +223,28 @@ class TaskwarriorTest extends \PHPUnit_Framework_TestCase
         $task1->setDescription('foo1');
         $task1->setDue($date);
 
-        $this->taskwarrior->save($task1);
-        $this->taskwarrior->clear();
+        $this->taskManager->save($task1);
+        $this->taskManager->clear();
 
-        $task2 = $this->taskwarrior->find($task1->getUuid());
+        $task2 = $this->taskManager->find($task1->getUuid());
         $this->assertEquals($date, $task2->getDue());
 
         $newDate = $this->createDateTime('2002-02-20 11:12:13');
 
         $task2->setDue($newDate);
 
-        $this->taskwarrior->save($task2);
-        $this->taskwarrior->clear();
+        $this->taskManager->save($task2);
+        $this->taskManager->clear();
 
-        $task3 = $this->taskwarrior->find($task1->getUuid());
+        $task3 = $this->taskManager->find($task1->getUuid());
         $this->assertEquals($newDate, $task3->getDue());
 
         $task2->setDue(null);
 
-        $this->taskwarrior->save($task2);
-        $this->taskwarrior->clear();
+        $this->taskManager->save($task2);
+        $this->taskManager->clear();
 
-        $task3 = $this->taskwarrior->find($task1->getUuid());
+        $task3 = $this->taskManager->find($task1->getUuid());
         $this->assertNull($task3->getDue());
     }
 
@@ -247,13 +254,13 @@ class TaskwarriorTest extends \PHPUnit_Framework_TestCase
         $task1->setDescription('foo1');
         $task1->setDue($this->createDateTime('1989-01-08 11:12:13'));
 
-        $this->taskwarrior->save($task1);
+        $this->taskManager->save($task1);
 
         $this->assertEquals(12, $task1->getUrgency());
 
         $task1->setDue(null);
 
-        $this->taskwarrior->save($task1);
+        $this->taskManager->save($task1);
 
         $this->assertEquals(0, $task1->getUrgency());
     }
@@ -270,15 +277,15 @@ class TaskwarriorTest extends \PHPUnit_Framework_TestCase
         $task3 = new Task();
         $task3->setDescription('foo3');
 
-        $this->taskwarrior->save($task1);
-        $this->taskwarrior->save($task2);
-        $this->taskwarrior->save($task3);
+        $this->taskManager->save($task1);
+        $this->taskManager->save($task2);
+        $this->taskManager->save($task3);
 
         $this->assertEquals(0, $task1->getUrgency());
         $this->assertEquals(12, $task2->getUrgency());
         $this->assertEquals(0, $task3->getUrgency());
 
-        $tasks = $this->taskwarrior->filter();
+        $tasks = $this->taskManager->filter();
 
         $this->assertEquals(array($task2, $task1, $task3), $tasks);
     }

@@ -3,12 +3,12 @@
 [![Build Status](https://travis-ci.org/DavidBadura/Taskwarrior.svg?branch=master)](https://travis-ci.org/DavidBadura/Taskwarrior)
 
 ```php
-$tw = new \DavidBadura\Taskwarrior\Taskwarrior();
+$tm = \DavidBadura\Taskwarrior\TaskManager::create();
 
 $task = new \DavidBadura\Taskwarrior\Task();
 $task->addTag('home');
 
-$tw->save($task);
+$tm->save($task);
 
-$tasks = $tw->filter('+home');
+$tasks = $tm->filter('+home');
 ```
