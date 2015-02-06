@@ -116,6 +116,20 @@ class TaskwarriorTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(2, $this->taskwarrior->filter());
     }
 
+    public function testMultiFilter()
+    {
+        $task1 = new Task();
+        $task1->setDescription('foo1');
+
+        $task2 = new Task();
+        $task2->setDescription('foo2');
+
+        $this->taskwarrior->save($task1);
+        $this->taskwarrior->save($task2);
+
+        $this->assertCount(2, $this->taskwarrior->filter('status:pending')); // todo better test
+    }
+
     public function testPending()
     {
         $task1 = new Task();

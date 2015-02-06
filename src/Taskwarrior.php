@@ -24,7 +24,7 @@ class Taskwarrior
     /**
      * @param string $taskrc
      * @param string $taskData
-     * @param array $rcOptions
+     * @param array  $rcOptions
      */
     public function __construct($taskrc = '~/.taskrc', $taskData = '~/.task', $rcOptions = [])
     {
@@ -76,11 +76,15 @@ class Taskwarrior
     }
 
     /**
-     * @param $filter
+     * @param string|array $filter
      * @return Task[]
      */
-    public function filterAll($filter = '')
+    public function filterAll($filter = null)
     {
+        if (is_string($filter)) {
+            $filter = explode(' ', $filter);
+        }
+
         $result = $this->export($filter);
 
         foreach ($result as $key => $task) {
@@ -98,10 +102,10 @@ class Taskwarrior
     }
 
     /**
-     * @param string $filter
+     * @param string|array $filter
      * @return Task[]
      */
-    public function filter($filter = '')
+    public function filter($filter = null)
     {
         $tasks = $this->filterAll($filter . ' status:pending');
 
@@ -164,10 +168,10 @@ class Taskwarrior
     }
 
     /**
-     * @param string $filter
+     * @param string|array $filter
      * @return Task[]
      */
-    private function export($filter = '')
+    private function export($filter = null)
     {
         $json = $this->command('export', $filter);
 
@@ -179,18 +183,26 @@ class Taskwarrior
     }
 
     /**
-     * @param string $command
-     * @param string $filter
-     * @param array $options
+     * @param string       $command
+     * @param string|array $filter
+     * @param array        $options
      * @return string
      * @throws TaskwarriorException
      */
-    private function command($command, $filter = null, $options = array())
+    private function command($command, $filter = null, array $options = array())
     {
         $builder = $this->createProcessBuilder();
 
-        if ($filter) {
-            $builder->add($filter);
+        if (!is_array($filter)) {
+            $filter = [$filter];
+        }
+
+        foreach ($filter as $param) {
+            if (empty($param)) {
+                continue;
+            }
+
+            $builder->add($param);
         }
 
         $builder->add($command);
@@ -264,13 +276,16 @@ class Taskwarrior
      */
     private function sort(array $tasks)
     {
-        usort($tasks, function (Task $a, Task $b) {
-            if(0 != $diff = $b->getUrgency() - $a->getUrgency()) {
-                return $diff;
-            }
+        usort(
+            $tasks,
+            function (Task $a, Task $b) {
+                if (0 != $diff = $b->getUrgency() - $a->getUrgency()) {
+                    return $diff;
+                }
 
-            return $a->getEntry() >= $b->getEntry() ? 1 : -1;
-        });
+                return $a->getEntry() >= $b->getEntry() ? 1 : -1;
+            }
+        );
 
         return $tasks;
     }
@@ -309,9 +324,9 @@ class Taskwarrior
     }
 
     /**
-     * @param Task $task
+     * @param Task   $task
      * @param string $attr
-     * @param mixed $value
+     * @param mixed  $value
      */
     private function setValue(Task $task, $attr, $value)
     {
