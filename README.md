@@ -14,5 +14,9 @@ $task->addTag('next'); // todo :D
 
 $tm->save($task);
 
-$tasks = $tm->filter('project:hobby');
+$tasks = $tm->filter('project:hobby'); // one task
+
+$tm->done($task);
+
+$tasks = $tm->filter('project:hobby'); // empty
 ```

@@ -12,7 +12,7 @@ use Symfony\Component\Process\ProcessBuilder;
 class TaskManager
 {
     /**
-     * @var array
+     * @var Taskwarrior
      */
     private $taskwarrior;
 
@@ -27,6 +27,14 @@ class TaskManager
     public function __construct(Taskwarrior $taskwarrior)
     {
         $this->taskwarrior = $taskwarrior;
+    }
+
+    /**
+     * @return Taskwarrior
+     */
+    public function getTaskwarrior()
+    {
+        return $this->taskwarrior;
     }
 
     /**
