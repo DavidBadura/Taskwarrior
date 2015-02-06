@@ -262,4 +262,14 @@ class Task
     {
         return $this->status == self::STATUS_DELETED;
     }
+
+    /**
+     *
+     */
+    public function __clone()
+    {
+        $this->uuid   = null;
+        $this->entry  = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->status = self::STATUS_PENDING;
+    }
 }

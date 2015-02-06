@@ -119,6 +119,32 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(1, $this->taskManager->filter());
     }
 
+    public function testClone()
+    {
+        $task = new Task();
+        $task->setDescription('foo');
+
+        $this->taskManager->save($task);
+        $this->assertCount(1, $this->taskManager->filter());
+
+        $task2 = clone $task;
+
+        $this->taskManager->save($task2);
+        $this->assertCount(2, $this->taskManager->filter());
+
+        $this->taskManager->done($task);
+        $this->isTrue($task->isCompleted());
+
+        $task3 = clone $task;
+
+        $this->isTrue($task3->isPending());
+        $this->taskManager->save($task3);
+
+        $this->isTrue($task->isCompleted());
+        $this->isTrue($task3->isPending());
+    }
+
+
     public function testFilterAll()
     {
         $task1 = new Task();
