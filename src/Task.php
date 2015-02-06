@@ -184,6 +184,10 @@ class Task
      */
     public function addTag($tag)
     {
+        if (!$this->tags) {
+            $this->tags = [$tag];
+        }
+
         if (!in_array($tag, $this->tags)) {
             $this->tags[] = $tag;
         }
@@ -194,6 +198,10 @@ class Task
      */
     public function removeTag($tag)
     {
+        if (!$this->tags) {
+            return;
+        }
+
         if (false !== $key = array_search($tag, $this->tags)) {
             unset($this->tags[$key]);
         }

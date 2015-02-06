@@ -15,7 +15,6 @@ $task->setDescription('program this lib');
 $task->setProject('hobby');
 $task->setDue(new \DateTime('tomorrow'));
 $task->setPriority(Task::PRIORITY_HIGH);
-
 $task->addTag('next');
 
 $tm->save($task);

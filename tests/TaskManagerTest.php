@@ -140,11 +140,14 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
 
         $task2 = new Task();
         $task2->setDescription('foo2');
+        $task2->setPriority(Task::PRIORITY_HIGH);
+        $task2->setProject('home');
+        $task2->addTag('now');
 
         $this->taskManager->save($task1);
         $this->taskManager->save($task2);
 
-        $this->assertCount(2, $this->taskManager->filter('status:pending')); // todo better test
+        $this->assertCount(1, $this->taskManager->filter('project:home prio:H +now'));
     }
 
     public function testPending()
@@ -384,6 +387,8 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $task1 = $this->taskManager->find($task1->getUuid());
         $this->assertEmpty($task1->getTags());
 
+        $task1->removeTag('a');
+        $task1->addTag('a');
         $task1->setTags(array('a', 'b', 'c'));
         $this->taskManager->save($task1);
         $this->taskManager->clear();
