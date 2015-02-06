@@ -19,7 +19,7 @@ class Taskwarrior
     /**
      * @param string $taskrc
      * @param string $taskData
-     * @param array  $rcOptions
+     * @param array $rcOptions
      */
     public function __construct($taskrc = '~/.taskrc', $taskData = '~/.task', $rcOptions = [])
     {
@@ -52,52 +52,48 @@ class Taskwarrior
 
     /**
      * @param array $params
-     * @param string|array  $filter
+     * @throws TaskwarriorException
      */
-    public function modify(array $params, $filter = null)
+    public function add(array $params)
     {
-        $options = [];
-
-        if (array_key_exists('due', $params)) {
-            $options[] = 'due:' . $params['due'];
-        }
-
-        if (array_key_exists('project', $params)) {
-            $options[] = 'project:' . $params['project'];
-        }
-
-        if (array_key_exists('priority', $params)) {
-            $options[] = 'priority:' . $params['priority'];
-        }
-
-        if (array_key_exists('tags', $params)) {
-            if (is_array($params['tags'])) {
-                $options[] = 'tags:' . implode(',', $params['tags']);
-            } else {
-                $options[] = 'tags:' . $params['tags'];
-            }
-        }
-
-        if (array_key_exists('description', $params)) {
-            $options[] = $params['description'];
-        }
-
-        $this->command('modify', $filter, $options);
+        $this->command('modify', null, $this->getOptions($params));
     }
 
     /**
+     * @param array $params
+     * @param string|array $filter
+     */
+    public function modify(array $params, $filter = null)
+    {
+        $this->command('modify', $filter, $this->getOptions($params));
+    }
+
+    /**
+     * @param null $filter
      * @return array
      * @throws TaskwarriorException
      */
-    public function projects()
+    public function projects($filter = null)
     {
-        $result = $this->command('_project');
+        $result = $this->command('_project', $filter);
 
         return array_filter(explode("\n", $result), 'strlen');
     }
 
     /**
-     * @param string $json
+     * @param null $filter
+     * @return array
+     * @throws TaskwarriorException
+     */
+    public function tags($filter = null)
+    {
+        $result = $this->command('_tags', $filter);
+
+        return array_filter(explode("\n", $result), 'strlen');
+    }
+
+    /**
+      * @param string $json
      * @return string
      * @throws TaskwarriorException
      */
@@ -112,11 +108,11 @@ class Taskwarrior
 
         $fs->remove($file);
 
-        if (!preg_match('/([0-9a-f]{8}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{12})/', $output, $matches)) {
-            throw new TaskwarriorException();
+        if ($uuid = self::parseUuid($output)) {
+            return $uuid;
         }
 
-        return $matches[1];
+        throw new TaskwarriorException();
     }
 
     /**
@@ -129,9 +125,9 @@ class Taskwarrior
     }
 
     /**
-     * @param string       $command
+     * @param string $command
      * @param string|array $filter
-     * @param array        $options
+     * @param array $options
      * @return string
      * @throws TaskwarriorException
      */
@@ -140,7 +136,7 @@ class Taskwarrior
         $builder = $this->createProcessBuilder();
 
         if (!is_array($filter)) {
-            $filter = [$filter];
+            $filter = explode(' ', $filter);
         }
 
         foreach ($filter as $param) {
@@ -181,6 +177,49 @@ class Taskwarrior
     }
 
     /**
+     * @param $params
+     * @return array
+     */
+    private function getOptions($params)
+    {
+        $options = [];
+
+        if (array_key_exists('due', $params)) {
+            $options[] = 'due:' . $params['due'];
+        }
+
+        if (array_key_exists('wait', $params)) {
+            $options[] = 'wait:' . $params['wait'];
+        }
+
+        if (array_key_exists('until', $params)) {
+            $options[] = 'until:' . $params['until'];
+        }
+
+        if (array_key_exists('project', $params)) {
+            $options[] = 'project:' . $params['project'];
+        }
+
+        if (array_key_exists('priority', $params)) {
+            $options[] = 'priority:' . $params['priority'];
+        }
+
+        if (array_key_exists('tags', $params)) {
+            if (is_array($params['tags'])) {
+                $options[] = 'tags:' . implode(',', $params['tags']);
+            } else {
+                $options[] = 'tags:' . $params['tags'];
+            }
+        }
+
+        if (array_key_exists('description', $params)) {
+            $options[] = $params['description'];
+        }
+
+        return $options;
+    }
+
+    /**
      * @return ProcessBuilder
      */
     private function createProcessBuilder()
@@ -195,5 +234,18 @@ class Taskwarrior
         $builder->setTimeout(360);
 
         return $builder;
+    }
+
+    /**
+     * @param string $string
+     * @return string|null
+     */
+    public static function parseUuid($string)
+    {
+        if (preg_match('/([0-9a-f]{8}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{12})/', $string, $matches)) {
+            return $matches[1];
+        }
+
+        return null;
     }
 }

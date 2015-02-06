@@ -54,6 +54,20 @@ class Task
     private $due;
 
     /**
+     * @var \DateTime
+     *
+     * @JMS\Type(name="DateTime<'Ymd\THis\Z'>")
+     */
+    private $wait;
+
+    /**
+     * @var \DateTime
+     *
+     * @JMS\Type(name="DateTime<'Ymd\THis\Z'>")
+     */
+    private $until;
+
+    /**
      * @var array
      *
      * @JMS\Type(name="array<string>")
@@ -73,6 +87,21 @@ class Task
      * @JMS\Type(name="DateTime<'Ymd\THis\Z'>")
      */
     private $entry;
+
+
+    /**
+     * @var \DateTime
+     *
+     * @JMS\Type(name="DateTime<'Ymd\THis\Z'>")
+     */
+    private $modified;
+
+    /**
+     * @var \DateTime
+     *
+     * @JMS\Type(name="DateTime<'Ymd\THis\Z'>")
+     */
+    private $end;
 
     /**
      * @var string
@@ -156,11 +185,43 @@ class Task
     }
 
     /**
-     * @param \DateTime $due
+     * @param \DateTime|string $due
      */
-    public function setDue(\DateTime $due = null)
+    public function setDue($due = null)
     {
-        $this->due = $due;
+        $this->due = $this->parseDateTime($due);
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getWait()
+    {
+        return $this->wait;
+    }
+
+    /**
+     * @param \DateTime|string $wait
+     */
+    public function setWait($wait = null)
+    {
+        $this->wait = $this->parseDateTime($wait);
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getUntil()
+    {
+        return $this->until;
+    }
+
+    /**
+     * @param \DateTime|string $until
+     */
+    public function setUntil($until = null)
+    {
+        $this->until = $this->parseDateTime($until);
     }
 
     /**
@@ -216,6 +277,22 @@ class Task
     }
 
     /**
+     * @return \DateTime
+     */
+    public function getModified()
+    {
+        return $this->modified;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getEnd()
+    {
+        return $this->end;
+    }
+
+    /**
      * @return float
      */
     public function getUrgency()
@@ -261,6 +338,32 @@ class Task
     public function isDeleted()
     {
         return $this->status == self::STATUS_DELETED;
+    }
+
+    /**
+     * @param string|\DateTime|null $date
+     * @return \DateTime|null
+     * @throws TaskwarriorException
+     */
+    private function parseDateTime($date)
+    {
+        if ($date instanceof \DateTime) {
+
+            $date = clone $date;
+            $date->setTimezone(new \DateTimeZone('UTC'));
+
+            return $date;
+        }
+
+        if (is_string($date)) {
+            return new \DateTime($date, new \DateTimeZone('UTC'));
+        }
+
+        if ($date === null) {
+            return null;
+        }
+
+        throw new TaskwarriorException();
     }
 
     /**

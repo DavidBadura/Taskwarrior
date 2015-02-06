@@ -176,6 +176,32 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(1, $this->taskManager->filter('project:home prio:H +now'));
     }
 
+    public function testDates()
+    {
+        $task1 = new Task();
+        $task1->setDescription('foo1');
+
+        $this->taskManager->save($task1);
+
+        $this->assertInstanceOf('DateTime', $task1->getEntry());
+        $this->assertNull($task1->getModified());
+        $this->assertNull($task1->getEnd());
+
+        $task1->setDescription('bar2');
+
+        $this->taskManager->save($task1);
+
+        $this->assertInstanceOf('DateTime', $task1->getEntry());
+        $this->assertInstanceOf('DateTime', $task1->getModified());
+        $this->assertNull($task1->getEnd());
+
+        $this->taskManager->done($task1);
+
+        $this->assertInstanceOf('DateTime', $task1->getEntry());
+        $this->assertInstanceOf('DateTime', $task1->getModified());
+        $this->assertInstanceOf('DateTime', $task1->getEnd());
+    }
+
     public function testPending()
     {
         $task1 = new Task();
@@ -377,7 +403,7 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $this->taskManager->save($task1);
         $this->taskManager->save($task2);
 
-        $this->assertEquals(array('home', 'office'), $this->taskManager->projects());
+        $this->assertEquals(array('home', 'office'), $this->taskwarrior->projects());
     }
 
     public function testPriority()
@@ -434,6 +460,46 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(1, $this->taskManager->filter('+b'));
     }
 
+    public function testWait()
+    {
+        $task1 = new Task();
+        $task1->setDescription('foo1');
+
+        $this->taskManager->save($task1);
+        $this->taskManager->clear();
+
+        $task1 = $this->taskManager->find($task1->getUuid());
+        $this->assertNull($task1->getWait());
+
+        $task1->setWait($this->createDateTime('+2 sec'));
+        $this->taskManager->save($task1);
+        $this->assertTrue($task1->isWaiting());
+
+        $this->assertCount(0, $this->taskManager->filter());
+        $this->assertCount(1, $this->taskManager->filterAll('status:waiting'));
+
+        sleep(3);
+
+        $this->assertCount(1, $this->taskManager->filter());
+        $this->assertFalse($task1->isWaiting());
+    }
+
+    public function testUntil()
+    {
+        $this->markTestIncomplete('not working yet');
+
+        $task1 = new Task();
+        $task1->setDescription('foo1');
+        $task1->setUntil('+2 sec');
+
+        $this->taskManager->save($task1);
+
+        $this->assertCount(1, $this->taskManager->filter());
+
+        sleep(3);
+
+        $this->assertCount(0, $this->taskManager->filter());
+    }
 
     /**
      * @param string $string
@@ -441,6 +507,6 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
      */
     private function createDateTime($string = 'now')
     {
-        return new \DateTime($string, new \DateTimeZone('UTC'));
+        return new \DateTime($string);
     }
 }

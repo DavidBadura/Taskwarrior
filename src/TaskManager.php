@@ -47,6 +47,8 @@ class TaskManager
         } else {
             $this->edit($task);
         }
+
+        $this->refresh($task);
     }
 
     /**
@@ -89,6 +91,7 @@ class TaskManager
             if (isset($this->tasks[$task->getUuid()])) {
 
                 $result[$key] = $this->tasks[$task->getUuid()];
+                $this->merge($result[$key], $task);
 
                 continue;
             }
@@ -120,7 +123,7 @@ class TaskManager
         }
 
         $this->taskwarrior->delete($task->getUuid());
-        $this->update($task);
+        $this->refresh($task);
     }
 
     /**
@@ -133,15 +136,16 @@ class TaskManager
         }
 
         $this->taskwarrior->done($task->getUuid());
-        $this->update($task);
+        $this->refresh($task);
     }
 
     /**
-     * @return array
+     * @param Task $task
      */
-    public function projects()
+    public function refresh(Task $task)
     {
-        return $this->taskwarrior->projects();
+        $clean = $this->export($task->getUuid())[0];
+        $this->merge($task, $clean);
     }
 
     /**
@@ -178,8 +182,6 @@ class TaskManager
 
         $this->setValue($task, 'uuid', $uuid);
         $this->tasks[$uuid] = $task;
-
-        $this->update($task);
     }
 
     /**
@@ -194,22 +196,22 @@ class TaskManager
                 'priority'    => $task->getPriority(),
                 'tags'        => $task->getTags(),
                 'due'         => $task->getDue() ? $task->getDue()->format('Ymd\THis\Z') : null,
+                'wait'        => $task->getWait() ? $task->getWait()->format('Ymd\THis\Z') : null,
             ],
             $task->getUuid()
         );
-
-        $this->update($task);
     }
 
     /**
-     * @param Task $task
+     * @param Task $old
+     * @param Task $new
      */
-    private function update(Task $task)
+    private function merge(Task $old, Task $new)
     {
-        $clean = $this->export($task->getUuid())[0];
-
-        $this->setValue($task, 'urgency', $clean->getUrgency());
-        $this->setValue($task, 'status', $clean->getStatus());
+        $this->setValue($old, 'urgency', $new->getUrgency());
+        $this->setValue($old, 'status', $new->getStatus());
+        $this->setValue($old, 'modified', $new->getModified());
+        $this->setValue($old, 'end', $new->getEnd());
     }
 
     /**
@@ -249,9 +251,9 @@ class TaskManager
     }
 
     /**
-     * @param Task   $task
+     * @param Task $task
      * @param string $attr
-     * @param mixed  $value
+     * @param mixed $value
      */
     private function setValue(Task $task, $attr, $value)
     {
