@@ -351,6 +351,28 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('home', 'office'), $this->taskManager->projects());
     }
 
+    public function testPriority()
+    {
+        $task1 = new Task();
+        $task1->setDescription('foo1');
+        $task1->setPriority(Task::PRIORITY_MEDIUM);
+
+        $this->taskManager->save($task1);
+        $this->taskManager->clear();
+
+        $task1 = $this->taskManager->find($task1->getUuid());
+
+        $this->assertEquals(Task::PRIORITY_MEDIUM, $task1->getPriority());
+
+        $task1->setPriority(Task::PRIORITY_HIGH);
+
+        $this->taskManager->save($task1);
+        $this->taskManager->clear();
+        $task1 = $this->taskManager->find($task1->getUuid());
+
+        $this->assertEquals(Task::PRIORITY_HIGH, $task1->getPriority());
+    }
+
     /**
      * @param string $string
      * @return \DateTime

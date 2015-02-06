@@ -14,6 +14,10 @@ class Task
     const STATUS_DELETED   = 'deleted';
     const STATUS_WAITING   = 'waiting';
 
+    const PRIORITY_LOW = 'L';
+    const PRIORITY_MEDIUM = 'M';
+    const PRIORITY_HIGH = 'H';
+
     /**
      * @var string
      *
@@ -27,6 +31,13 @@ class Task
      * @JMS\Type(name="string")
      */
     private $description;
+
+    /**
+     * @var string
+     *
+     * @JMS\Type(name="string")
+     */
+    private $priority;
 
     /**
      * @var string
@@ -95,6 +106,22 @@ class Task
     public function setDescription($description)
     {
         $this->description = $description;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPriority()
+    {
+        return $this->priority;
+    }
+
+    /**
+     * @param string $priority
+     */
+    public function setPriority($priority)
+    {
+        $this->priority = $priority;
     }
 
     /**

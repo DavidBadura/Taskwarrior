@@ -66,6 +66,10 @@ class Taskwarrior
             $options[] = 'project:' . $params['project'];
         }
 
+        if (array_key_exists('priority', $params)) {
+            $options[] = 'priority:' . $params['priority'];
+        }
+
         if (array_key_exists('description', $params)) {
             $options[] = $params['description'];
         }
@@ -85,7 +89,7 @@ class Taskwarrior
     }
 
     /**
-     * @param $json
+     * @param string $json
      * @return string
      * @throws TaskwarriorException
      */
