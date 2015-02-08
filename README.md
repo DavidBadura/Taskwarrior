@@ -16,6 +16,7 @@ $task->setProject('hobby');
 $task->setDue(new \DateTime('tomorrow'));
 $task->setPriority(Task::PRIORITY_HIGH);
 $task->addTag('next');
+$task->setRecur('daily');
 
 $tm->save($task);
 

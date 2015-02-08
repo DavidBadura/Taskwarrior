@@ -14,6 +14,7 @@ class Task
     const STATUS_COMPLETED = 'completed';
     const STATUS_DELETED   = 'deleted';
     const STATUS_WAITING   = 'waiting';
+    const STATUS_RECURRING = 'recurring';
 
     const PRIORITY_LOW    = 'L';
     const PRIORITY_MEDIUM = 'M';
@@ -22,28 +23,28 @@ class Task
     /**
      * @var string
      *
-     * @JMS\Type(name="string")
+     * @JMS\Type("string")
      */
     private $uuid;
 
     /**
      * @var string
      *
-     * @JMS\Type(name="string")
+     * @JMS\Type("string")
      */
     private $description;
 
     /**
      * @var string
      *
-     * @JMS\Type(name="string")
+     * @JMS\Type("string")
      */
     private $priority;
 
     /**
      * @var string
      *
-     * @JMS\Type(name="string")
+     * @JMS\Type("string")
      */
     private $project;
 
@@ -62,23 +63,16 @@ class Task
     private $wait;
 
     /**
-     * @var Carbon
-     *
-     * @JMS\Type("Carbon")
-     */
-    private $until;
-
-    /**
      * @var array
      *
-     * @JMS\Type(name="array<string>")
+     * @JMS\Type("array<string>")
      */
     private $tags;
 
     /**
      * @var float
      *
-     * @JMS\Type(name="float")
+     * @JMS\Type("float")
      */
     private $urgency;
 
@@ -89,6 +83,19 @@ class Task
      */
     private $entry;
 
+    /**
+     * @var string
+     *
+     * @JMS\Type("string")
+     */
+    private $recur;
+
+    /**
+     * @var Carbon
+     *
+     * @JMS\Type("Carbon")
+     */
+    private $until;
 
     /**
      * @var Carbon
@@ -107,7 +114,7 @@ class Task
     /**
      * @var string
      *
-     * @JMS\Type(name="string")
+     * @JMS\Type("string")
      */
     private $status;
 
@@ -210,22 +217,6 @@ class Task
     }
 
     /**
-     * @return \DateTime
-     */
-    public function getUntil()
-    {
-        return $this->until;
-    }
-
-    /**
-     * @param \DateTime|string $until
-     */
-    public function setUntil($until = null)
-    {
-        $this->until = $this->parseDateTime($until);
-    }
-
-    /**
      * @return array
      */
     public function getTags()
@@ -267,6 +258,38 @@ class Task
         if (false !== $key = array_search($tag, $this->tags)) {
             unset($this->tags[$key]);
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getRecur()
+    {
+        return $this->recur;
+    }
+
+    /**
+     * @param string $recur
+     */
+    public function setRecur($recur)
+    {
+        $this->recur = $recur;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getUntil()
+    {
+        return $this->until;
+    }
+
+    /**
+     * @param \DateTime|string $until
+     */
+    public function setUntil($until = null)
+    {
+        $this->until = $this->parseDateTime($until);
     }
 
     /**
@@ -339,6 +362,14 @@ class Task
     public function isDeleted()
     {
         return $this->status == self::STATUS_DELETED;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isReccuring()
+    {
+        return $this->status == self::STATUS_RECURRING;
     }
 
     /**

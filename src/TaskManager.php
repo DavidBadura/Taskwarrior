@@ -163,6 +163,7 @@ class TaskManager
      */
     private function export($filter = null)
     {
+        $this->update();
         $json = $this->taskwarrior->export($filter);
 
         return $this->getSerializer()->deserialize($json, 'array<DavidBadura\Taskwarrior\Task>', 'json');
@@ -209,6 +210,18 @@ class TaskManager
         $this->setValue($old, 'status', $new->getStatus());
         $this->setValue($old, 'modified', $new->getModified());
         $this->setValue($old, 'end', $new->getEnd());
+    }
+
+    /**
+     *
+     */
+    private function update()
+    {
+        try {
+            $this->taskwarrior->command('list');
+        } catch (TaskwarriorException $e) {
+            // to nothing
+        }
     }
 
     /**

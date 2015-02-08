@@ -24,6 +24,7 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
+        $this->tearDown();
         $this->taskwarrior = new Taskwarrior(__DIR__ . '/.taskrc', __DIR__ . '/.task');
         $this->taskManager = new TaskManager($this->taskwarrior);
         $this->taskwarrior->version(); // to initialise
@@ -506,10 +507,27 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($task1->isWaiting());
     }
 
+    public function testRecurring()
+    {
+        $task1 = new Task();
+        $task1->setDescription('foo1');
+        $task1->setDue('tomorrow');
+        $task1->setRecur('daily');
+
+        $this->taskManager->save($task1);
+
+        $this->assertCount(2, $this->taskManager->filterAll());
+
+        $this->assertTrue($task1->isReccuring());
+
+        $result = $this->taskManager->filter();
+        $this->assertCount(1, $result);
+
+        $this->assertTrue($result[0]->isPending());
+    }
+
     public function testUntil()
     {
-        $this->markTestIncomplete('not working yet');
-
         $task1 = new Task();
         $task1->setDescription('foo1');
         $task1->setUntil('+2 sec');
