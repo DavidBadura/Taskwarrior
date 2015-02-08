@@ -221,7 +221,7 @@ class TaskManager
         try {
             $this->taskwarrior->command('list');
         } catch (TaskwarriorException $e) {
-            // to nothing
+            // do nothing
         }
     }
 
@@ -281,7 +281,6 @@ class TaskManager
                 $registry->registerSubscribingHandler(new RecurringHandler());
             })
             ->addDefaultHandlers()
-            ->setDebug(true)
             ->build();
     }
 

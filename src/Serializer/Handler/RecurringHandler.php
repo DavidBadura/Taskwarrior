@@ -48,7 +48,7 @@ class RecurringHandler implements SubscribingHandlerInterface
      */
     public function serializeCarbon(VisitorInterface $visitor, Recurring $recurring, array $type, Context $context)
     {
-        return $visitor->visitString((string)$recurring, $type, $context);
+        return $visitor->visitString($recurring->getValue(), $type, $context);
     }
 
     /**

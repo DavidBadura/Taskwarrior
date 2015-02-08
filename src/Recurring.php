@@ -42,6 +42,14 @@ class Recurring
     /**
      * @return string
      */
+    public function getValue()
+    {
+        return $this->recurring;
+    }
+
+    /**
+     * @return string
+     */
     public function __toString()
     {
         return $this->recurring;
