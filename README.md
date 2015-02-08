@@ -4,6 +4,14 @@
 
 ![WOW](http://i.imgur.com/mvSQh0M.gif)
 
+## Install
+
+```bash
+composer require 'davidbadura/taskwarrior=dev-master'
+```
+
+## Usage
+
 ```php
 use DavidBadura\Taskwarrior\TaskManager;
 use DavidBadura\Taskwarrior\Task;
@@ -27,3 +35,7 @@ $tm->done($task);
 
 $tasks = $tm->filter('project:hobby'); // empty
 ```
+
+## API
+
+todo...
