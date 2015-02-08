@@ -107,6 +107,13 @@ class Task
     private $until;
 
     /**
+     * @var Annotation[]
+     *
+     * @JMS\Type("array<DavidBadura\Taskwarrior\Annotation>")
+     */
+    private $annotations;
+
+    /**
      * @var Carbon
      *
      * @JMS\Type("Carbon")
@@ -350,6 +357,46 @@ class Task
     public function setUntil($until = null)
     {
         $this->until = $this->parseDateTime($until);
+    }
+
+    /**
+     * @return Annotation[]
+     */
+    public function getAnnotations()
+    {
+        return $this->annotations;
+    }
+
+    /**
+     * @param Annotation[] $annotations
+     */
+    public function setAnnotations(array $annotations = [])
+    {
+        $this->annotations = [];
+
+        foreach ($annotations as $annotation) {
+            $this->addAnnotation($annotation);
+        }
+    }
+
+    /**
+     * @param Annotation $annotation
+     */
+    public function addAnnotation(Annotation $annotation)
+    {
+        if (!in_array($annotation, $this->annotations)) {
+            $this->annotations[] = $annotation;
+        }
+    }
+
+    /**
+     * @param Annotation $annotation
+     */
+    public function removeAnnotation(Annotation $annotation)
+    {
+        if ($key = array_search($annotation, $this->annotations)) {
+            unset($this->annotations[$key]);
+        }
     }
 
     /**
