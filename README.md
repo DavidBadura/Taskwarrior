@@ -7,7 +7,7 @@
 ## Install
 
 ```bash
-composer require 'davidbadura/taskwarrior=dev-master'
+composer require 'davidbadura/taskwarrior'
 ```
 
 ## Usage
