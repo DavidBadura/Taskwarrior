@@ -2,9 +2,10 @@
 
 namespace DavidBadura\Taskwarrior;
 
+use DavidBadura\Taskwarrior\Serializer\Handler\CarbonHandler;
+use JMS\Serializer\Handler\HandlerRegistryInterface;
+use JMS\Serializer\Serializer;
 use JMS\Serializer\SerializerBuilder;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Process\ProcessBuilder;
 
 /**
  * @author David Badura <d.a.badura@gmail.com>
@@ -164,11 +165,7 @@ class TaskManager
     {
         $json = $this->taskwarrior->export($filter);
 
-        $serializer = SerializerBuilder::create()
-            ->addDefaultHandlers()
-            ->build();
-
-        return $serializer->deserialize($json, 'array<DavidBadura\Taskwarrior\Task>', 'json');
+        return $this->getSerializer()->deserialize($json, 'array<DavidBadura\Taskwarrior\Task>', 'json');
     }
 
     /**
@@ -241,11 +238,7 @@ class TaskManager
      */
     private function serializeTask(Task $task)
     {
-        $serializer = SerializerBuilder::create()
-            ->addDefaultHandlers()
-            ->build();
-
-        $result = $serializer->serialize($task, 'json');
+        $result = $this->getSerializer()->serialize($task, 'json');
 
         return str_replace("\\/", "/", $result);
     }
@@ -261,6 +254,20 @@ class TaskManager
         $prop            = $reflectionClass->getProperty($attr);
         $prop->setAccessible(true);
         $prop->setValue($task, $value);
+    }
+
+    /**
+     * @return Serializer
+     */
+    private function getSerializer()
+    {
+        return SerializerBuilder::create()
+            ->configureHandlers(function (HandlerRegistryInterface $registry) {
+                $registry->registerSubscribingHandler(new CarbonHandler());
+            })
+            ->addDefaultHandlers()
+            ->setDebug(true)
+            ->build();
     }
 
     /**

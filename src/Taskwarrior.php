@@ -17,6 +17,11 @@ class Taskwarrior
     private $rcOptions;
 
     /**
+     * @var string
+     */
+    private $version;
+
+    /**
      * @param string $taskrc
      * @param string $taskData
      * @param array $rcOptions
@@ -56,7 +61,7 @@ class Taskwarrior
      */
     public function add(array $params)
     {
-        $this->command('modify', null, $this->getOptions($params));
+        $this->command('add', null, $this->getOptions($params));
     }
 
     /**
@@ -173,7 +178,11 @@ class Taskwarrior
      */
     public function version()
     {
-        return $this->command('_version');
+        if ($this->version) {
+            return $this->version;
+        }
+
+        return $this->version = $this->command('_version');
     }
 
     /**

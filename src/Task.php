@@ -2,6 +2,7 @@
 
 namespace DavidBadura\Taskwarrior;
 
+use Carbon\Carbon;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -47,23 +48,23 @@ class Task
     private $project;
 
     /**
-     * @var \DateTime
+     * @var Carbon
      *
-     * @JMS\Type(name="DateTime<'Ymd\THis\Z'>")
+     * @JMS\Type("Carbon")
      */
     private $due;
 
     /**
-     * @var \DateTime
+     * @var Carbon
      *
-     * @JMS\Type(name="DateTime<'Ymd\THis\Z'>")
+     * @JMS\Type("Carbon")
      */
     private $wait;
 
     /**
-     * @var \DateTime
+     * @var Carbon
      *
-     * @JMS\Type(name="DateTime<'Ymd\THis\Z'>")
+     * @JMS\Type("Carbon")
      */
     private $until;
 
@@ -82,24 +83,24 @@ class Task
     private $urgency;
 
     /**
-     * @var \DateTime
+     * @var Carbon
      *
-     * @JMS\Type(name="DateTime<'Ymd\THis\Z'>")
+     * @JMS\Type("Carbon")
      */
     private $entry;
 
 
     /**
-     * @var \DateTime
+     * @var Carbon
      *
-     * @JMS\Type(name="DateTime<'Ymd\THis\Z'>")
+     * @JMS\Type("Carbon")
      */
     private $modified;
 
     /**
-     * @var \DateTime
+     * @var Carbon
      *
-     * @JMS\Type(name="DateTime<'Ymd\THis\Z'>")
+     * @JMS\Type("Carbon")
      */
     private $end;
 
@@ -116,7 +117,7 @@ class Task
     public function __construct()
     {
         $this->urgency = 0;
-        $this->entry   = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->entry   = new Carbon('now', new \DateTimeZone('UTC'));
         $this->status  = self::STATUS_PENDING;
     }
 
@@ -348,7 +349,10 @@ class Task
     private function parseDateTime($date)
     {
         if ($date instanceof \DateTime) {
+            return new Carbon($date->format('Y-m-d H:i:s'), new \DateTimeZone('UTC'));
+        }
 
+        if ($date instanceof Carbon) {
             $date = clone $date;
             $date->setTimezone(new \DateTimeZone('UTC'));
 
@@ -356,7 +360,7 @@ class Task
         }
 
         if (is_string($date)) {
-            return new \DateTime($date, new \DateTimeZone('UTC'));
+            return new Carbon($date, new \DateTimeZone('UTC'));
         }
 
         if ($date === null) {
@@ -372,7 +376,7 @@ class Task
     public function __clone()
     {
         $this->uuid   = null;
-        $this->entry  = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->entry  = new Carbon('now', new \DateTimeZone('UTC'));
         $this->status = self::STATUS_PENDING;
     }
 }

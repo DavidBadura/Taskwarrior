@@ -176,8 +176,15 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(1, $this->taskManager->filter('project:home prio:H +now'));
     }
 
-    public function testDates()
+    public function testModified()
     {
+        if (version_compare($this->taskwarrior->version(), '2.2.0', '>=')) {
+            $this->markTestSkipped(sprintf(
+                'taskwarrior version %s dont support modified attr',
+                $this->taskwarrior->version()
+            ));
+        }
+
         $task1 = new Task();
         $task1->setDescription('foo1');
 
@@ -185,7 +192,6 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('DateTime', $task1->getEntry());
         $this->assertNull($task1->getModified());
-        $this->assertNull($task1->getEnd());
 
         $task1->setDescription('bar2');
 
@@ -193,12 +199,28 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('DateTime', $task1->getEntry());
         $this->assertInstanceOf('DateTime', $task1->getModified());
+    }
+
+    public function testEnd()
+    {
+        $task1 = new Task();
+        $task1->setDescription('foo1');
+
+        $this->taskManager->save($task1);
+
+        $this->assertInstanceOf('DateTime', $task1->getEntry());
+        $this->assertNull($task1->getEnd());
+
+        $task1->setDescription('bar2');
+
+        $this->taskManager->save($task1);
+
+        $this->assertInstanceOf('DateTime', $task1->getEntry());
         $this->assertNull($task1->getEnd());
 
         $this->taskManager->done($task1);
 
         $this->assertInstanceOf('DateTime', $task1->getEntry());
-        $this->assertInstanceOf('DateTime', $task1->getModified());
         $this->assertInstanceOf('DateTime', $task1->getEnd());
     }
 
@@ -507,6 +529,6 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
      */
     private function createDateTime($string = 'now')
     {
-        return new \DateTime($string);
+        return new \DateTime($string, new \DateTimeZone('UTC'));
     }
 }
