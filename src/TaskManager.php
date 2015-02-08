@@ -3,6 +3,7 @@
 namespace DavidBadura\Taskwarrior;
 
 use DavidBadura\Taskwarrior\Serializer\Handler\CarbonHandler;
+use DavidBadura\Taskwarrior\Serializer\Handler\RecurringHandler;
 use JMS\Serializer\Handler\HandlerRegistryInterface;
 use JMS\Serializer\Serializer;
 use JMS\Serializer\SerializerBuilder;
@@ -277,6 +278,7 @@ class TaskManager
         return SerializerBuilder::create()
             ->configureHandlers(function (HandlerRegistryInterface $registry) {
                 $registry->registerSubscribingHandler(new CarbonHandler());
+                $registry->registerSubscribingHandler(new RecurringHandler());
             })
             ->addDefaultHandlers()
             ->setDebug(true)

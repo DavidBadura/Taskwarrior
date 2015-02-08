@@ -86,7 +86,7 @@ class Task
     /**
      * @var string
      *
-     * @JMS\Type("string")
+     * @JMS\Type("Recurring")
      */
     private $recur;
 
@@ -269,11 +269,19 @@ class Task
     }
 
     /**
-     * @param string $recur
+     * @param string|Recurring $recur
+     * @throws TaskwarriorException
      */
     public function setRecur($recur)
     {
-        $this->recur = $recur;
+        if (is_string($recur)) {
+            $this->recur = new Recurring($recur);
+        } elseif ($recur instanceof Recurring) {
+            $this->recur = $recur;
+        } else {
+            throw new TaskwarriorException();
+
+        }
     }
 
     /**

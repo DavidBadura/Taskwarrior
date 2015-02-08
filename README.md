@@ -7,6 +7,7 @@
 ```php
 use DavidBadura\Taskwarrior\TaskManager;
 use DavidBadura\Taskwarrior\Task;
+use DavidBadura\Taskwarrior\Recurring;
 
 $tm = TaskManager::create();
 
@@ -16,7 +17,7 @@ $task->setProject('hobby');
 $task->setDue(new \DateTime('tomorrow'));
 $task->setPriority(Task::PRIORITY_HIGH);
 $task->addTag('next');
-$task->setRecur('daily');
+$task->setRecur(new Recurring(Recurring::DAILY));
 
 $tm->save($task);
 
