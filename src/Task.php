@@ -263,7 +263,7 @@ class Task
     /**
      * @return string
      */
-    public function getRecur()
+    public function getRecurring()
     {
         return $this->recur;
     }
@@ -272,7 +272,7 @@ class Task
      * @param string|Recurring $recur
      * @throws TaskwarriorException
      */
-    public function setRecur($recur)
+    public function setRecurring($recur)
     {
         if (is_string($recur)) {
             $this->recur = new Recurring($recur);

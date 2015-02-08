@@ -14,10 +14,10 @@ $tm = TaskManager::create();
 $task = new Task();
 $task->setDescription('program this lib');
 $task->setProject('hobby');
-$task->setDue(new \DateTime('tomorrow'));
+$task->setDue('tomorrow');
 $task->setPriority(Task::PRIORITY_HIGH);
 $task->addTag('next');
-$task->setRecur(new Recurring(Recurring::DAILY));
+$task->setRecurring(Recurring::DAILY);
 
 $tm->save($task);
 

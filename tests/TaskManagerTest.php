@@ -512,7 +512,7 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $task1 = new Task();
         $task1->setDescription('foo1');
         $task1->setDue('tomorrow');
-        $task1->setRecur('daily');
+        $task1->setRecurring('daily');
 
         $this->taskManager->save($task1);
 

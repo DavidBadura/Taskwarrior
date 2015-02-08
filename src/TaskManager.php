@@ -264,10 +264,10 @@ class TaskManager
      */
     private function setValue(Task $task, $attr, $value)
     {
-        $reflectionClass = new \ReflectionClass('DavidBadura\Taskwarrior\Task');
-        $prop            = $reflectionClass->getProperty($attr);
-        $prop->setAccessible(true);
-        $prop->setValue($task, $value);
+        $refClass = new \ReflectionClass('DavidBadura\Taskwarrior\Task');
+        $refProp  = $refClass->getProperty($attr);
+        $refProp->setAccessible(true);
+        $refProp->setValue($task, $value);
     }
 
     /**

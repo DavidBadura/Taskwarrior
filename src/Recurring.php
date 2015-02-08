@@ -32,7 +32,7 @@ class Recurring
      */
     public function __construct($recurring)
     {
-        if ($this->isValid($recurring)) {
+        if (self::isValid($recurring)) {
             $this->recurring = $recurring;
         } else {
             throw new TaskwarriorException();
@@ -51,7 +51,7 @@ class Recurring
      * @param string $recur
      * @return bool
      */
-    private function isValid($recur)
+    public static function isValid($recur)
     {
         $refClass = new \ReflectionClass(__CLASS__);
         $constants = $refClass->getConstants();
