@@ -182,7 +182,7 @@ class Taskwarrior
             return $this->version;
         }
 
-        return $this->version = $this->command('_version');
+        return $this->version = trim($this->command('_version'));
     }
 
     /**

@@ -179,7 +179,7 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testModified()
     {
-        if (version_compare($this->taskwarrior->version(), '2.2.0', '>=')) {
+        if (version_compare($this->taskwarrior->version(), '2.2.0') < 0) {
             $this->markTestSkipped(sprintf(
                 'taskwarrior version %s dont support modified attr',
                 $this->taskwarrior->version()
