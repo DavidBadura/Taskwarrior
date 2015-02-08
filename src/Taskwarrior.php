@@ -205,6 +205,10 @@ class Taskwarrior
             $options[] = 'until:' . $params['until'];
         }
 
+        if (array_key_exists('recur', $params)) {
+            $options[] = 'recur:' . $params['recur'];
+        }
+
         if (array_key_exists('project', $params)) {
             $options[] = 'project:' . $params['project'];
         }

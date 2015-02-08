@@ -2,6 +2,7 @@
 
 namespace DavidBadura\Taskwarrior\Test;
 
+use DavidBadura\Taskwarrior\Recurring;
 use DavidBadura\Taskwarrior\Task;
 use DavidBadura\Taskwarrior\TaskManager;
 use DavidBadura\Taskwarrior\Taskwarrior;
@@ -526,6 +527,31 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($result[0]->isPending());
     }
 
+    public function testRecurringModify()
+    {
+        $recur1 = new Recurring(Recurring::DAILY);
+        $recur2 = new Recurring(Recurring::WEEKLY);
+
+        $task1 = new Task();
+        $task1->setDescription('foo1');
+        $task1->setDue('tomorrow');
+        $task1->setRecurring($recur1);
+
+        $this->taskManager->save($task1);
+        $this->taskManager->clear();
+
+        $task1 = $this->taskManager->find($task1->getUuid());
+        $this->assertEquals($recur1, $task1->getRecurring());
+
+        $task1->setRecurring($recur2);
+
+        $this->taskManager->save($task1);
+        $this->taskManager->clear();
+
+        $task1 = $this->taskManager->find($task1->getUuid());
+        $this->assertEquals($recur2, $task1->getRecurring());
+    }
+
     public function testUntil()
     {
         $task1 = new Task();
@@ -539,6 +565,31 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         sleep(3);
 
         $this->assertCount(0, $this->taskManager->filter());
+    }
+
+
+    public function testUntilModify()
+    {
+        $date1 = $this->createDateTime('tomorrow');
+        $date2 = $this->createDateTime('+2 day');
+
+        $task1 = new Task();
+        $task1->setDescription('foo1');
+        $task1->setUntil($date1);
+
+        $this->taskManager->save($task1);
+        $this->taskManager->clear();
+
+        $task1 = $this->taskManager->find($task1->getUuid());
+        $this->assertEquals($date1, $task1->getUntil());
+
+        $task1->setUntil($date2);
+
+        $this->taskManager->save($task1);
+        $this->taskManager->clear();
+
+        $task1 = $this->taskManager->find($task1->getUuid());
+        $this->assertEquals($date2, $task1->getUntil());
     }
 
     /**

@@ -196,6 +196,8 @@ class TaskManager
                 'tags'        => $task->getTags(),
                 'due'         => $task->getDue() ? $task->getDue()->format('Ymd\THis\Z') : null,
                 'wait'        => $task->getWait() ? $task->getWait()->format('Ymd\THis\Z') : null,
+                'until'       => $task->getUntil() ? $task->getUntil()->format('Ymd\THis\Z') : null,
+                'recur'       => $task->getRecurring() ? $task->getRecurring()->getValue() : null,
             ],
             $task->getUuid()
         );

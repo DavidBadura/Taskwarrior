@@ -261,7 +261,7 @@ class Task
     }
 
     /**
-     * @return string
+     * @return Recurring
      */
     public function getRecurring()
     {
