@@ -225,6 +225,10 @@ class Taskwarrior
             }
         }
 
+        if (array_key_exists('status', $params)) {
+            $options[] = 'status:' . $params['status'];
+        }
+
         if (array_key_exists('description', $params)) {
             $options[] = $params['description'];
         }

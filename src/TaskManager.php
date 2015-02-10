@@ -144,6 +144,26 @@ class TaskManager
     /**
      * @param Task $task
      */
+    public function reopen(Task $task)
+    {
+        if (!$task->getUuid()) {
+            return;
+        }
+
+        if ($task->isPending() || $task->isWaiting() || $task->isReccuring()) {
+            return;
+        }
+
+        $this->taskwarrior->modify([
+            'status' => Task::STATUS_PENDING
+        ], $task->getUuid());
+
+        $this->refresh($task);
+    }
+
+    /**
+     * @param Task $task
+     */
     public function refresh(Task $task)
     {
         $clean = $this->export($task->getUuid())[0];
@@ -212,7 +232,12 @@ class TaskManager
         $this->setValue($old, 'urgency', $new->getUrgency());
         $this->setValue($old, 'status', $new->getStatus());
         $this->setValue($old, 'modified', $new->getModified());
-        $this->setValue($old, 'end', $new->getEnd());
+
+        if ($new->isPending()) { // fix reopen problem
+            $this->setValue($old, 'end', null);
+        } else {
+            $this->setValue($old, 'end', $new->getEnd());
+        }
     }
 
     /**

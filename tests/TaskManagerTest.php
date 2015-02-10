@@ -592,6 +592,32 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($date2, $task1->getUntil());
     }
 
+    public function testReopen()
+    {
+        $task = new Task();
+        $task->setDescription('foo');
+
+        $this->taskManager->save($task);
+        $this->assertTrue($task->isPending());
+        $this->assertNull($task->getEnd());
+
+        $this->taskManager->done($task);
+        $this->assertTrue($task->isCompleted());
+        $this->assertInstanceOf('Carbon\Carbon', $task->getEnd());
+
+        $this->taskManager->reopen($task);
+        $this->assertTrue($task->isPending());
+        $this->assertNull($task->getEnd());
+
+        $this->taskManager->delete($task);
+        $this->assertTrue($task->isDeleted());
+        $this->assertInstanceOf('Carbon\Carbon', $task->getEnd());
+
+        $this->taskManager->reopen($task);
+        $this->assertTrue($task->isPending());
+        $this->assertNull($task->getEnd());
+    }
+
     /**
      * @param string $string
      * @return \DateTime
