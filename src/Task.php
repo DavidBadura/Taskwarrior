@@ -278,9 +278,8 @@ class Task
             $this->recur = new Recurring($recur);
         } elseif ($recur instanceof Recurring) {
             $this->recur = $recur;
-        } else {
-            throw new TaskwarriorException();
-
+        } elseif ($this->recur && is_null($recur)) {
+            throw new TaskwarriorException('You cannot remove the recurrence from a recurring task.');
         }
     }
 

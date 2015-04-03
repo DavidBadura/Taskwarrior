@@ -461,6 +461,8 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $this->taskManager->clear();
 
         $task1 = $this->taskManager->find($task1->getUuid());
+
+        $this->assertTrue(is_array($task1->getTags()));
         $this->assertEmpty($task1->getTags());
 
         $task1->removeTag('a');
@@ -525,6 +527,32 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(1, $result);
 
         $this->assertTrue($result[0]->isPending());
+    }
+
+    public function testRecurringException()
+    {
+        $this->setExpectedException('DavidBadura\Taskwarrior\TaskwarriorException');
+
+        $task1 = new Task();
+        $task1->setDescription('foo1');
+        $task1->setDue('tomorrow');
+        $task1->setRecurring('daily');
+
+        $this->taskManager->save($task1);
+
+        $task1->setRecurring(null);
+    }
+
+    public function testRecurringNull()
+    {
+        $task1 = new Task();
+        $task1->setDescription('foo1');
+        $task1->setDue('tomorrow');
+        $task1->setRecurring(null);
+
+        $this->taskManager->save($task1);
+
+        $this->assertCount(1, $this->taskManager->filterAll());
     }
 
     public function testRecurringModify()

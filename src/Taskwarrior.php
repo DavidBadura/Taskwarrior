@@ -40,19 +40,19 @@ class Taskwarrior
     }
 
     /**
-     * @param string $uuid
+     * @param string $filter
      */
-    public function delete($uuid)
+    public function delete($filter)
     {
-        $this->command('delete', $uuid);
+        $this->command('delete', $filter);
     }
 
     /**
-     * @param string $uuid
+     * @param string $filter
      */
-    public function done($uuid)
+    public function done($filter)
     {
-        $this->command('done', $uuid);
+        $this->command('done', $filter);
     }
 
     /**
