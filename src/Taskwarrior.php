@@ -94,7 +94,11 @@ class Taskwarrior
     {
         $result = $this->command('_tags', $filter);
 
-        return $this->parseResult($result);
+        $tags = $this->parseResult($result);
+
+        return array_values(array_filter($tags, function ($value) {
+            return !in_array($value, ['next', 'nocal', 'nocolor', 'nonag']);
+        }));
     }
 
     /**

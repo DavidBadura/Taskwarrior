@@ -497,7 +497,7 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
 
         $task1 = $this->taskManager->find($task1->getUuid());
         $this->assertEquals(array('später'), $task1->getTags());
-        $this->assertEquals(array('next', 'nocal', 'nocolor', 'nonag', 'später'), $this->taskwarrior->tags());
+        $this->assertEquals(array('später'), $this->taskwarrior->tags());
 
         $this->assertCount(1,$this->taskManager->filter('+später'));
     }
