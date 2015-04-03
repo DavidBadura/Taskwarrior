@@ -44,6 +44,8 @@ class TaskManager
      */
     public function save(Task $task)
     {
+        $this->validate($task);
+
         if (!$task->getUuid()) {
             $this->add($task);
         } else {
@@ -209,10 +211,6 @@ class TaskManager
      */
     private function edit(Task $task)
     {
-        if ($task->isReccuring() && !$task->getRecurring()) {
-            throw new TaskwarriorException('You cannot remove the recurrence from a recurring task.');
-        }
-
         $this->taskwarrior->modify(
             [
                 'description' => $task->getDescription(),
@@ -226,6 +224,17 @@ class TaskManager
             ],
             $task->getUuid()
         );
+    }
+
+    /**
+     * @param Task $task
+     * @throws TaskwarriorException
+     */
+    private function validate(Task $task)
+    {
+        if ($task->isReccuring() && !$task->getRecurring()) {
+            throw new TaskwarriorException('You cannot remove the recurrence from a recurring task.');
+        }
     }
 
     /**
