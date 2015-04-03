@@ -270,16 +270,15 @@ class Task
 
     /**
      * @param string|Recurring $recur
-     * @throws TaskwarriorException
      */
     public function setRecurring($recur)
     {
-        if (is_string($recur)) {
-            $this->recur = new Recurring($recur);
-        } elseif ($recur instanceof Recurring) {
+        if ($recur instanceof Recurring) {
             $this->recur = $recur;
-        } elseif ($this->recur && is_null($recur)) {
-            throw new TaskwarriorException('You cannot remove the recurrence from a recurring task.');
+        } elseif ($recur) {
+            $this->recur = new Recurring($recur);
+        } else {
+            $this->recur = null;
         }
     }
 

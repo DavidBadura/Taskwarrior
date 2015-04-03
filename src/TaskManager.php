@@ -205,9 +205,14 @@ class TaskManager
 
     /**
      * @param Task $task
+     * @throws TaskwarriorException
      */
     private function edit(Task $task)
     {
+        if ($task->isReccuring() && !$task->getRecurring()) {
+            throw new TaskwarriorException('You cannot remove the recurrence from a recurring task.');
+        }
+
         $this->taskwarrior->modify(
             [
                 'description' => $task->getDescription(),

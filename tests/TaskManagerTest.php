@@ -541,6 +541,8 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $this->taskManager->save($task1);
 
         $task1->setRecurring(null);
+
+        $this->taskManager->save($task1);
     }
 
     public function testRecurringNull()
