@@ -82,7 +82,7 @@ class Taskwarrior
     {
         $result = $this->command('_project', $filter);
 
-        return array_filter(explode("\n", $result), 'strlen');
+        return $this->parseResult($result);
     }
 
     /**
@@ -94,11 +94,11 @@ class Taskwarrior
     {
         $result = $this->command('_tags', $filter);
 
-        return array_filter(explode("\n", $result), 'strlen');
+        return $this->parseResult($result);
     }
 
     /**
-      * @param string $json
+     * @param string $json
      * @return string
      * @throws TaskwarriorException
      */
@@ -158,12 +158,21 @@ class Taskwarrior
             $builder->add($param);
         }
 
+        /*
+         * Local hack to allow utf8 chars
+         */
+        $oldLocal = setlocale(LC_CTYPE, 0);
+        setlocale(LC_CTYPE, 'UTF8', 'en_US.UTF-8');
+
         $process = $builder->getProcess();
+
+        setlocale(LC_CTYPE, $oldLocal);
+
         $process->run();
 
         if (!$process->isSuccessful()) {
             throw new TaskwarriorException(
-                $process->getErrorOutput(),
+                $this->extractErrorMessage($process->getErrorOutput()),
                 $process->getExitCode(),
                 $process->getCommandLine()
             );
@@ -251,6 +260,34 @@ class Taskwarrior
         $builder->setTimeout(360);
 
         return $builder;
+    }
+
+    /**
+     * @param string $string
+     * @return string
+     */
+    private function extractErrorMessage($string)
+    {
+        $message = '';
+
+        foreach (explode("\n", $string) as $line) {
+            if (strpos($line, 'Using alternate') === 0 || strpos($line, 'Configuration override') === 0) {
+                continue;
+            }
+
+            $message .= $line . "\n";
+        }
+
+        return trim($message);
+    }
+
+    /**
+     * @param string $string
+     * @return array
+     */
+    private function parseResult($string)
+    {
+        return array_filter(explode("\n", $string), 'strlen');
     }
 
     /**

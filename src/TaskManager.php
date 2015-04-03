@@ -5,6 +5,10 @@ namespace DavidBadura\Taskwarrior;
 use DavidBadura\Taskwarrior\Serializer\Handler\CarbonHandler;
 use DavidBadura\Taskwarrior\Serializer\Handler\RecurringHandler;
 use JMS\Serializer\Handler\HandlerRegistryInterface;
+use JMS\Serializer\JsonSerializationVisitor;
+use JMS\Serializer\Naming\CamelCaseNamingStrategy;
+use JMS\Serializer\Naming\SerializedNameAnnotationStrategy;
+use JMS\Serializer\SerializationContext;
 use JMS\Serializer\Serializer;
 use JMS\Serializer\SerializerBuilder;
 
@@ -41,10 +45,15 @@ class TaskManager
 
     /**
      * @param Task $task
+     * @throws TaskwarriorException
      */
     public function save(Task $task)
     {
-        $this->validate($task);
+        $errors = $this->validate($task);
+
+        if ($errors) {
+            throw new TaskwarriorException(implode(', ', $errors));
+        }
 
         if (!$task->getUuid()) {
             $this->add($task);
@@ -152,7 +161,7 @@ class TaskManager
             return;
         }
 
-        if ($task->isPending() || $task->isWaiting() || $task->isReccuring()) {
+        if ($task->isPending() || $task->isWaiting() || $task->isRecurring()) {
             return;
         }
 
@@ -161,6 +170,29 @@ class TaskManager
         ], $task->getUuid());
 
         $this->refresh($task);
+    }
+
+    /**
+     * @param Task $task
+     * @return array
+     */
+    public function validate(Task $task)
+    {
+        $errors = [];
+
+        if ($task->isRecurring() && !$task->getDue()) {
+            $errors[] = 'You cannot remove the due date from a recurring task.';
+        }
+
+        if ($task->isRecurring() && !$task->getRecurring()) {
+            $errors[] = 'You cannot remove the recurrence from a recurring task.';
+        }
+
+        if ($task->getRecurring() && !$task->getDue()) {
+            $errors[] = "A recurring task must also have a 'due' date.";
+        }
+
+        return $errors;
     }
 
     /**
@@ -224,17 +256,6 @@ class TaskManager
             ],
             $task->getUuid()
         );
-    }
-
-    /**
-     * @param Task $task
-     * @throws TaskwarriorException
-     */
-    private function validate(Task $task)
-    {
-        if ($task->isReccuring() && !$task->getRecurring()) {
-            throw new TaskwarriorException('You cannot remove the recurrence from a recurring task.');
-        }
     }
 
     /**
@@ -316,12 +337,20 @@ class TaskManager
      */
     private function getSerializer()
     {
+        $propertyNamingStrategy = new SerializedNameAnnotationStrategy(new CamelCaseNamingStrategy());
+
+        $visitor = new JsonSerializationVisitor($propertyNamingStrategy);
+        $visitor->setOptions(JSON_UNESCAPED_UNICODE);
+
         return SerializerBuilder::create()
+            ->setPropertyNamingStrategy($propertyNamingStrategy)
             ->configureHandlers(function (HandlerRegistryInterface $registry) {
                 $registry->registerSubscribingHandler(new CarbonHandler());
                 $registry->registerSubscribingHandler(new RecurringHandler());
             })
             ->addDefaultHandlers()
+            ->setSerializationVisitor('json', $visitor)
+            ->addDefaultDeserializationVisitors()
             ->build();
     }
 

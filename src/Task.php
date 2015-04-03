@@ -373,7 +373,7 @@ class Task
     /**
      * @return bool
      */
-    public function isReccuring()
+    public function isRecurring()
     {
         return $this->status == self::STATUS_RECURRING;
     }

@@ -486,6 +486,22 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(1, $this->taskManager->filter('+b'));
     }
 
+    public function testTagUnicode()
+    {
+        $task1 = new Task();
+        $task1->setDescription('foo1');
+        $task1->addTag('später');
+
+        $this->taskManager->save($task1);
+        $this->taskManager->clear();
+
+        $task1 = $this->taskManager->find($task1->getUuid());
+        $this->assertEquals(array('später'), $task1->getTags());
+        $this->assertEquals(array('next', 'nocal', 'nocolor', 'nonag', 'später'), $this->taskwarrior->tags());
+
+        $this->assertCount(1,$this->taskManager->filter('+später'));
+    }
+
     public function testWait()
     {
         $task1 = new Task();
@@ -521,7 +537,7 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertCount(2, $this->taskManager->filterAll());
 
-        $this->assertTrue($task1->isReccuring());
+        $this->assertTrue($task1->isRecurring());
 
         $result = $this->taskManager->filter();
         $this->assertCount(1, $result);
@@ -529,9 +545,10 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($result[0]->isPending());
     }
 
-    public function testRecurringException()
+    public function testRecurringRemoveRecurringException()
     {
-        $this->setExpectedException('DavidBadura\Taskwarrior\TaskwarriorException');
+        $this->setExpectedException('DavidBadura\Taskwarrior\TaskwarriorException',
+            'You cannot remove the recurrence from a recurring task.');
 
         $task1 = new Task();
         $task1->setDescription('foo1');
@@ -544,6 +561,36 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->taskManager->save($task1);
     }
+
+    public function testRecurringRemoveDueException()
+    {
+        $this->setExpectedException('DavidBadura\Taskwarrior\TaskwarriorException',
+            'You cannot remove the due date from a recurring task.');
+
+        $task1 = new Task();
+        $task1->setDescription('foo1');
+        $task1->setDue('tomorrow');
+        $task1->setRecurring('daily');
+
+        $this->taskManager->save($task1);
+
+        $task1->setDue(null);
+
+        $this->taskManager->save($task1);
+    }
+
+    public function testRecurringWithoutDue()
+    {
+        $this->setExpectedException('DavidBadura\Taskwarrior\TaskwarriorException',
+            "A recurring task must also have a 'due' date.");
+
+        $task1 = new Task();
+        $task1->setDescription('foo1');
+        $task1->setRecurring('daily');
+
+        $this->taskManager->save($task1);
+    }
+
 
     public function testRecurringNull()
     {
