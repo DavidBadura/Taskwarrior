@@ -112,7 +112,7 @@ class TaskManager
             $this->tasks[$task->getUuid()] = $task;
         }
 
-        return $result;
+        return $this->sort($result);
     }
 
     /**
@@ -121,9 +121,7 @@ class TaskManager
      */
     public function filter($filter = null)
     {
-        $tasks = $this->filterAll($filter . ' status:pending');
-
-        return $this->sort($tasks);
+        return $this->filterAll($filter . ' status:pending');
     }
 
     /**
