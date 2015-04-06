@@ -64,12 +64,76 @@ class QueryBuilder
     }
 
     /**
+     * @return $this
+     */
+    public function wherePriorityL()
+    {
+        return $this->wherePriority(Task::PRIORITY_LOW);
+    }
+
+    /**
+     * @return $this
+     */
+    public function wherePriorityM()
+    {
+        return $this->wherePriority(Task::PRIORITY_MEDIUM);
+    }
+
+    /**
+     * @return $this
+     */
+    public function wherePriorityH()
+    {
+        return $this->wherePriority(Task::PRIORITY_HIGH);
+    }
+
+    /**
      * @param string $status
      * @return $this
      */
     public function whereStatus($status)
     {
         return $this->where('status:' . $status);
+    }
+
+    /**
+     * @return $this
+     */
+    public function wherePending()
+    {
+        return $this->whereStatus(Task::STATUS_PENDING);
+    }
+
+    /**
+     * @return $this
+     */
+    public function whereWaiting()
+    {
+        return $this->whereStatus(Task::STATUS_WAITING);
+    }
+
+    /**
+     * @return $this
+     */
+    public function whereCompleted()
+    {
+        return $this->whereStatus(Task::STATUS_COMPLETED);
+    }
+
+    /**
+     * @return $this
+     */
+    public function whereRecurring()
+    {
+        return $this->whereStatus(Task::STATUS_RECURRING);
+    }
+
+    /**
+     * @return $this
+     */
+    public function whereDeleted()
+    {
+        return $this->whereStatus(Task::STATUS_DELETED);
     }
 
     /**

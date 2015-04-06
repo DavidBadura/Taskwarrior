@@ -39,3 +39,12 @@ $tasks = $tm->filter('project:hobby'); // empty
 ## API
 
 todo...
+
+### QueryBuilder
+
+```php
+$tasks = $taskManager->createQueryBuilder()
+    ->whereProject('hobby')
+    ->sortBy(QueryBuilder::SORT_ENTRY)
+    ->getResult()
+```
