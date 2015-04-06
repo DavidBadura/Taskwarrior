@@ -354,31 +354,6 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, $task1->getUrgency());
     }
 
-    public function testUrgencySort()
-    {
-        $task1 = new Task();
-        $task1->setDescription('foo1');
-
-        $task2 = new Task();
-        $task2->setDescription('foo2');
-        $task2->setDue($this->createDateTime('1989-01-08 11:12:13'));
-
-        $task3 = new Task();
-        $task3->setDescription('foo3');
-
-        $this->taskManager->save($task1);
-        $this->taskManager->save($task2);
-        $this->taskManager->save($task3);
-
-        $this->assertEquals(0, $task1->getUrgency());
-        $this->assertEquals(12, $task2->getUrgency());
-        $this->assertEquals(0, $task3->getUrgency());
-
-        $tasks = $this->taskManager->filter();
-
-        $this->assertEquals(array($task2, $task1, $task3), $tasks);
-    }
-
     public function testProject()
     {
         $task1 = new Task();

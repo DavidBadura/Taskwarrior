@@ -2,7 +2,6 @@
 
 namespace DavidBadura\Taskwarrior;
 
-use Carbon\Carbon;
 use DavidBadura\Taskwarrior\Exception\TaskwarriorException;
 use DavidBadura\Taskwarrior\Serializer\Handler\CarbonHandler;
 use DavidBadura\Taskwarrior\Serializer\Handler\RecurringHandler;
@@ -113,7 +112,7 @@ class TaskManager
             $this->tasks[$task->getUuid()] = $task;
         }
 
-        return $this->sort($result);
+        return $result;
     }
 
     /**
@@ -217,6 +216,14 @@ class TaskManager
     }
 
     /**
+     * @return QueryBuilder
+     */
+    public function createQueryBuilder()
+    {
+        return new QueryBuilder($this);
+    }
+
+    /**
      * @param string|array $filter
      * @return Task[]
      */
@@ -289,26 +296,6 @@ class TaskManager
         } catch (TaskwarriorException $e) {
             // do nothing
         }
-    }
-
-    /**
-     * @param Task[] $tasks
-     * @return Task[]
-     */
-    private function sort(array $tasks)
-    {
-        usort(
-            $tasks,
-            function (Task $a, Task $b) {
-                if (0 != $diff = $b->getUrgency() - $a->getUrgency()) {
-                    return $diff;
-                }
-
-                return $a->getEntry() >= $b->getEntry() ? 1 : -1;
-            }
-        );
-
-        return $tasks;
     }
 
     /**
