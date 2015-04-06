@@ -67,7 +67,7 @@ class RecurringTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalid($recur)
     {
-        $this->setExpectedException('DavidBadura\Taskwarrior\TaskwarriorException');
+        $this->setExpectedException('DavidBadura\Taskwarrior\Exception\RecurringParseException');
 
         $obj = new Recurring($recur);
     }

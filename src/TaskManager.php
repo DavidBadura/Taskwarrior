@@ -2,13 +2,14 @@
 
 namespace DavidBadura\Taskwarrior;
 
+use Carbon\Carbon;
+use DavidBadura\Taskwarrior\Exception\TaskwarriorException;
 use DavidBadura\Taskwarrior\Serializer\Handler\CarbonHandler;
 use DavidBadura\Taskwarrior\Serializer\Handler\RecurringHandler;
 use JMS\Serializer\Handler\HandlerRegistryInterface;
 use JMS\Serializer\JsonSerializationVisitor;
 use JMS\Serializer\Naming\CamelCaseNamingStrategy;
 use JMS\Serializer\Naming\SerializedNameAnnotationStrategy;
-use JMS\Serializer\SerializationContext;
 use JMS\Serializer\Serializer;
 use JMS\Serializer\SerializerBuilder;
 
@@ -133,8 +134,13 @@ class TaskManager
             return;
         }
 
-        $this->taskwarrior->delete($task->getUuid());
-        $this->refresh($task);
+        if ($task->isRecurring()) {
+            $task->setUntil('now');
+            $this->save($task);
+        } else {
+            $this->taskwarrior->delete($task->getUuid());
+            $this->refresh($task);
+        }
     }
 
     /**

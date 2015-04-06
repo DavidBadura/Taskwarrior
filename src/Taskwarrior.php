@@ -2,7 +2,8 @@
 
 namespace DavidBadura\Taskwarrior;
 
-use JMS\Serializer\SerializerBuilder;
+use DavidBadura\Taskwarrior\Exception\CommandException;
+use DavidBadura\Taskwarrior\Exception\TaskwarriorException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\ProcessBuilder;
 
@@ -57,7 +58,6 @@ class Taskwarrior
 
     /**
      * @param array $params
-     * @throws TaskwarriorException
      */
     public function add(array $params)
     {
@@ -76,7 +76,6 @@ class Taskwarrior
     /**
      * @param null $filter
      * @return array
-     * @throws TaskwarriorException
      */
     public function projects($filter = null)
     {
@@ -88,7 +87,6 @@ class Taskwarrior
     /**
      * @param null $filter
      * @return array
-     * @throws TaskwarriorException
      */
     public function tags($filter = null)
     {
@@ -104,6 +102,7 @@ class Taskwarrior
     /**
      * @param string $json
      * @return string
+     * @throws CommandException
      * @throws TaskwarriorException
      */
     public function import($json)
@@ -175,11 +174,7 @@ class Taskwarrior
         $process->run();
 
         if (!$process->isSuccessful()) {
-            throw new TaskwarriorException(
-                $this->extractErrorMessage($process->getErrorOutput()),
-                $process->getExitCode(),
-                $process->getCommandLine()
-            );
+            throw new CommandException($process);
         }
 
         return $process->getOutput();
@@ -187,7 +182,6 @@ class Taskwarrior
 
     /**
      * @return string
-     * @throws TaskwarriorException
      */
     public function version()
     {
@@ -264,25 +258,6 @@ class Taskwarrior
         $builder->setTimeout(360);
 
         return $builder;
-    }
-
-    /**
-     * @param string $string
-     * @return string
-     */
-    private function extractErrorMessage($string)
-    {
-        $message = '';
-
-        foreach (explode("\n", $string) as $line) {
-            if (strpos($line, 'Using alternate') === 0 || strpos($line, 'Configuration override') === 0) {
-                continue;
-            }
-
-            $message .= $line . "\n";
-        }
-
-        return trim($message);
     }
 
     /**

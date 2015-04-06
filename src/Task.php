@@ -3,6 +3,7 @@
 namespace DavidBadura\Taskwarrior;
 
 use Carbon\Carbon;
+use DavidBadura\Taskwarrior\Exception\DatetimeParseException;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -381,7 +382,7 @@ class Task
     /**
      * @param string|\DateTime|null $date
      * @return \DateTime|null
-     * @throws TaskwarriorException
+     * @throws DatetimeParseException
      */
     private function parseDateTime($date)
     {
@@ -404,7 +405,7 @@ class Task
             return null;
         }
 
-        throw new TaskwarriorException();
+        throw new DatetimeParseException($date);
     }
 
     /**

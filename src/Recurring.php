@@ -5,21 +5,23 @@
 
 namespace DavidBadura\Taskwarrior;
 
+use DavidBadura\Taskwarrior\Exception\RecurringParseException;
+
 /**
  * @author David Badura <d.a.badura@gmail.com>
  */
 class Recurring
 {
-    const DAILY = 'daily';
-    const WEEKDAYS = 'weekdays';
-    const WEEKLY = 'weekly';
-    const BIWEEKLY = 'biweekly';
-    const QUARTERLY = 'quarterly';
+    const DAILY      = 'daily';
+    const WEEKDAYS   = 'weekdays';
+    const WEEKLY     = 'weekly';
+    const BIWEEKLY   = 'biweekly';
+    const QUARTERLY  = 'quarterly';
     const SEMIANNUAL = 'semiannual';
-    const ANNUAL = 'annual';
-    const YEARLY = 'yearly';
-    const BIANNUAL = 'biannual';
-    const BIYEARLY = 'biyearly';
+    const ANNUAL     = 'annual';
+    const YEARLY     = 'yearly';
+    const BIANNUAL   = 'biannual';
+    const BIYEARLY   = 'biyearly';
 
     /**
      * @var string
@@ -28,15 +30,15 @@ class Recurring
 
     /**
      * @param string $recurring
-     * @throws TaskwarriorException
+     * @throws RecurringParseException
      */
     public function __construct($recurring)
     {
-        if (self::isValid($recurring)) {
-            $this->recurring = $recurring;
-        } else {
-            throw new TaskwarriorException();
+        if (!self::isValid($recurring)) {
+            throw new RecurringParseException(sprintf('recurring "%s" is not valid', $recurring));
         }
+
+        $this->recurring = $recurring;
     }
 
     /**
@@ -61,7 +63,7 @@ class Recurring
      */
     public static function isValid($recur)
     {
-        $refClass = new \ReflectionClass(__CLASS__);
+        $refClass  = new \ReflectionClass(__CLASS__);
         $constants = $refClass->getConstants();
 
         if (in_array($recur, $constants)) {

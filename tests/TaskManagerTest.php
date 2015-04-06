@@ -61,7 +61,7 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testSaveTaskWithoutDescription()
     {
-        $this->setExpectedException('DavidBadura\Taskwarrior\TaskwarriorException');
+        $this->setExpectedException('DavidBadura\Taskwarrior\Exception\TaskwarriorException');
 
         $task = new Task();
 
@@ -547,7 +547,7 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testRecurringRemoveRecurringException()
     {
-        $this->setExpectedException('DavidBadura\Taskwarrior\TaskwarriorException',
+        $this->setExpectedException('DavidBadura\Taskwarrior\Exception\TaskwarriorException',
             'You cannot remove the recurrence from a recurring task.');
 
         $task1 = new Task();
@@ -564,7 +564,7 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testRecurringRemoveDueException()
     {
-        $this->setExpectedException('DavidBadura\Taskwarrior\TaskwarriorException',
+        $this->setExpectedException('DavidBadura\Taskwarrior\Exception\TaskwarriorException',
             'You cannot remove the due date from a recurring task.');
 
         $task1 = new Task();
@@ -581,7 +581,7 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testRecurringWithoutDue()
     {
-        $this->setExpectedException('DavidBadura\Taskwarrior\TaskwarriorException',
+        $this->setExpectedException('DavidBadura\Taskwarrior\Exception\TaskwarriorException',
             "A recurring task must also have a 'due' date.");
 
         $task1 = new Task();
@@ -627,6 +627,29 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
 
         $task1 = $this->taskManager->find($task1->getUuid());
         $this->assertEquals($recur2, $task1->getRecurring());
+    }
+
+    public function testRecurringDelete()
+    {
+        $this->markTestIncomplete('not working yet');
+
+        $recur1 = new Recurring(Recurring::DAILY);
+
+        $task1 = new Task();
+        $task1->setDescription('foo1');
+        $task1->setDue('tomorrow');
+        $task1->setRecurring($recur1);
+
+        $this->taskManager->save($task1);
+        $this->taskManager->clear();
+
+        $this->assertCount(1, $this->taskManager->filterAll('status:recurring'));
+
+        $this->taskManager->delete($task1);
+
+        $this->taskManager->clear();
+
+        $this->assertCount(0, $this->taskManager->filterAll('status:recurring'));
     }
 
     public function testUntil()
