@@ -5,7 +5,7 @@ namespace DavidBadura\Taskwarrior;
 /**
  * @author David Badura <d.a.badura@gmail.com>
  */
-class Config
+class Config implements \IteratorAggregate, \Countable
 {
     /**
      * @var array
@@ -42,9 +42,33 @@ class Config
     /**
      * @return array
      */
-    public function toArray()
+    public function keys()
+    {
+        return array_keys($this->config);
+    }
+
+    /**
+     * @return array
+     */
+    public function all()
     {
         return $this->config;
+    }
+
+    /**
+     * @return \ArrayIterator
+     */
+    public function getIterator()
+    {
+        return new \ArrayIterator($this->config);
+    }
+
+    /**
+     * @return int
+     */
+    public function count()
+    {
+        return count($this->config);
     }
 
     /**
@@ -63,6 +87,12 @@ class Config
             }
 
             list($key, $value) = explode('=', $line);
+
+            if ($value == 'no' || $value == 'off') {
+                $value = false;
+            } elseif ($value == 'yes' || $value == 'on') {
+                $value = true;
+            }
 
             $config[$key] = $value;
         }
