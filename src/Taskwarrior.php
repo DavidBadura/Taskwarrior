@@ -23,6 +23,11 @@ class Taskwarrior
     private $version;
 
     /**
+     * @var Config
+     */
+    private $config;
+
+    /**
      * @param string $taskrc
      * @param string $taskData
      * @param array $rcOptions
@@ -190,6 +195,19 @@ class Taskwarrior
         }
 
         return $this->version = trim($this->command('_version'));
+    }
+
+    /**
+     * @return Config
+     * @throws CommandException
+     */
+    public function config()
+    {
+        if (!$this->config) {
+            $this->config = Config::create($this->command('_show'));
+        }
+
+        return $this->config;
     }
 
     /**
