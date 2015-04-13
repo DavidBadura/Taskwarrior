@@ -10,6 +10,8 @@
 composer require 'davidbadura/taskwarrior'
 ```
 
+**Requirements: Taskwarrior > 2.1**
+
 ## Usage
 
 ```php
