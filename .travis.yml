@@ -15,10 +15,17 @@ env:
       - PREFER_LOWEST=""
 
 before_install:
-  - sudo add-apt-repository ppa:ultrafredde/ppa -y
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq task --force-yes
+  - wget http://taskwarrior.org/download/task-2.4.2.tar.gz
+  - gunzip task-2.4.2.tar.gz
+  - tar xf task-2.4.2.tar
+  - cd task-2.4.2
+  - sudo apt-get install cmake build-essential uuid-dev libgnutls-dev libreadline6-dev --force-yes
+  - sudo cmake -DCMAKE_BUILD_TYPE=release .
+  - sudo make
+  - sudo make install
+  - sudo ln -s /usr/local/bin/task /usr/bin/task
   - task --version
+  - cd ..
 
 before_script:
     - composer self-update
