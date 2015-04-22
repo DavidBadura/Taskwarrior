@@ -158,7 +158,10 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $this->taskManager->save($task1);
         $this->taskManager->save($task2);
 
-        $this->assertCount(2, $this->taskManager->filter());
+        $result = $this->taskManager->filter();
+
+        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $result);
+        $this->assertCount(2, $result);
     }
 
     public function testMultiFilter()

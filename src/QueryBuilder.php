@@ -2,16 +2,23 @@
 
 namespace DavidBadura\Taskwarrior;
 
-use DavidBadura\Taskwarrior\Exception\TaskwarriorException;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Criteria;
 
 /**
  * @author David Badura <d.a.badura@gmail.com>
  */
 class QueryBuilder
 {
-    const SORT_URGENCY     = 'urgency';
-    const SORT_DESCRIPTION = 'description';
-    const SORT_ENTRY       = 'entry';
+    /**
+     * @var string
+     */
+    const ASC = Criteria::ASC;
+
+    /**
+     * @var string
+     */
+    const DESC = Criteria::DESC;
 
     /**
      * @var TaskManager
@@ -24,9 +31,9 @@ class QueryBuilder
     protected $filter = [];
 
     /**
-     * @var string
+     * @var Criteria
      */
-    protected $sortBy = self::SORT_URGENCY;
+    protected $criteria;
 
     /**
      * @param TaskManager $taskManager
@@ -34,6 +41,7 @@ class QueryBuilder
     public function __construct(TaskManager $taskManager)
     {
         $this->taskManager = $taskManager;
+        $this->criteria    = new Criteria();
     }
 
     /**
@@ -148,12 +156,34 @@ class QueryBuilder
     }
 
     /**
-     * @param string $by
+     * @param array $orderings
      * @return $this
      */
-    public function sortBy($by = self::SORT_URGENCY)
+    public function orderBy(array $orderings)
     {
-        $this->sortBy = $by;
+        $this->criteria->orderBy($orderings);
+
+        return $this;
+    }
+
+    /**
+     * @param int $firstResult
+     * @return $this
+     */
+    public function setFirstResult($firstResult)
+    {
+        $this->criteria->setFirstResult($firstResult);
+
+        return $this;
+    }
+
+    /**
+     * @param int $maxResults
+     * @return $this
+     */
+    public function setMaxResults($maxResults)
+    {
+        $this->criteria->setMaxResults($maxResults);
 
         return $this;
     }
@@ -167,58 +197,12 @@ class QueryBuilder
     }
 
     /**
-     * @return Task[]
+     * @return Task[]|ArrayCollection
      */
     public function getResult()
     {
         $result = $this->taskManager->filter($this->getFilter());
 
-        return $this->sort($result, $this->sortBy);
-    }
-
-    /**
-     * @param Task[] $tasks
-     * @param string $by
-     * @return Task[]
-     * @throws TaskwarriorException
-     */
-    protected function sort(array $tasks, $by)
-    {
-        switch ($by) {
-            case self::SORT_ENTRY:
-
-                $callback = function (Task $a, Task $b) {
-                    return $a->getEntry() >= $b->getEntry() ? 1 : -1;
-                };
-
-                break;
-
-            case self::SORT_DESCRIPTION:
-
-                $callback = function (Task $a, Task $b) {
-                    return strcmp($b->getDescription(), $a->getDescription());
-                };
-
-                break;
-
-            case self::SORT_URGENCY:
-
-                $callback = function (Task $a, Task $b) {
-                    if (0 != $diff = $b->getUrgency() - $a->getUrgency()) {
-                        return $diff;
-                    }
-
-                    return $a->getEntry() >= $b->getEntry() ? 1 : -1;
-                };
-
-                break;
-
-            default:
-                throw new TaskwarriorException('sorting by "%s" is not supported', $by);
-        }
-
-        usort($tasks, $callback);
-
-        return $tasks;
+        return $result->matching($this->criteria);
     }
 }
