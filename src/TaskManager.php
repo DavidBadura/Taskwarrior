@@ -5,6 +5,7 @@ namespace DavidBadura\Taskwarrior;
 use DavidBadura\Taskwarrior\Exception\TaskwarriorException;
 use DavidBadura\Taskwarrior\Serializer\Handler\CarbonHandler;
 use DavidBadura\Taskwarrior\Serializer\Handler\RecurringHandler;
+use Doctrine\Common\Collections\ArrayCollection;
 use JMS\Serializer\Handler\HandlerRegistryInterface;
 use JMS\Serializer\JsonSerializationVisitor;
 use JMS\Serializer\Naming\CamelCaseNamingStrategy;
@@ -90,7 +91,7 @@ class TaskManager
 
     /**
      * @param string|array $filter
-     * @return Task[]
+     * @return Task[]|ArrayCollection
      */
     public function filterAll($filter = null)
     {
@@ -112,12 +113,12 @@ class TaskManager
             $this->tasks[$task->getUuid()] = $task;
         }
 
-        return $result;
+        return new ArrayCollection($result);
     }
 
     /**
      * @param string|array $filter
-     * @return Task[]
+     * @return Task[]|ArrayCollection
      */
     public function filter($filter = null)
     {
