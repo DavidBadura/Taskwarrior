@@ -260,9 +260,9 @@ class TaskManager
             'project'     => $task->getProject(),
             'priority'    => $task->getPriority(),
             'tags'        => $task->getTags(),
-            'due'         => $task->getDue() ? $task->getDue()->format('Ymd\THis\Z') : null,
-            'wait'        => $task->getWait() ? $task->getWait()->format('Ymd\THis\Z') : null,
-            'until'       => $task->getUntil() ? $task->getUntil()->format('Ymd\THis\Z') : null
+            'due'         => $this->transformDate($task->getDue()),
+            'wait'        => $this->transformDate($task->getWait()),
+            'until'       => $this->transformDate($task->getUntil())
         ];
 
         if ($task->getRecurring()) {
@@ -324,6 +324,22 @@ class TaskManager
         $refProp  = $refClass->getProperty($attr);
         $refProp->setAccessible(true);
         $refProp->setValue($task, $value);
+    }
+
+    /**
+     * @param \DateTime $dateTime
+     * @return null|string
+     */
+    private function transformDate(\DateTime $dateTime = null)
+    {
+        if (!$dateTime) {
+            return null;
+        }
+
+        $dateTime = clone $dateTime;
+        $dateTime->setTimezone(new \DateTimeZone('UTC'));
+
+        return $dateTime->format('Ymd\THis\Z');
     }
 
     /**
