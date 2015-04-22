@@ -15,7 +15,16 @@ env:
       - PREFER_LOWEST=""
 
 before_install:
+  - wget http://taskwarrior.org/download/task-2.4.2.tar.gz
+  - gunzip task-2.4.2.tar.gz
+  - tar xf task-2.4.2.tar
+  - cd task-2.4.2
+  - sudo apt-get install cmake build-essential uuid-dev libgnutls-dev libreadline6-dev
   - sudo apt-get install -qq task --force-yes
+  - sudo cmake -DCMAKE_BUILD_TYPE=release .
+  - sudo make
+  - sudo make install
+  - sudo ln -s /usr/local/bin/task /usr/bin/task
   - task --version
 
 before_script:
