@@ -25,6 +25,7 @@ before_install:
   - sudo make install
   - sudo ln -s /usr/local/bin/task /usr/bin/task
   - task --version
+  - cd ..
 
 before_script:
     - composer self-update
