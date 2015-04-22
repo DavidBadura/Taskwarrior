@@ -707,6 +707,6 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
      */
     private function createDateTime($string = 'now')
     {
-        return new \DateTime($string, new \DateTimeZone('UTC'));
+        return new \DateTime($string);
     }
 }

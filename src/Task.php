@@ -125,7 +125,7 @@ class Task
     public function __construct()
     {
         $this->urgency = 0;
-        $this->entry   = new Carbon('now', new \DateTimeZone('UTC'));
+        $this->entry   = new Carbon('now');
         $this->status  = self::STATUS_PENDING;
     }
 
@@ -387,18 +387,15 @@ class Task
     private function parseDateTime($date)
     {
         if ($date instanceof \DateTime) {
-            return new Carbon($date->format('Y-m-d H:i:s'), new \DateTimeZone('UTC'));
+            return new Carbon($date->format('Y-m-d H:i:s'));
         }
 
         if ($date instanceof Carbon) {
-            $date = clone $date;
-            $date->setTimezone(new \DateTimeZone('UTC'));
-
             return $date;
         }
 
         if (is_string($date)) {
-            return new Carbon($date, new \DateTimeZone('UTC'));
+            return new Carbon($date);
         }
 
         if ($date === null) {
@@ -414,7 +411,7 @@ class Task
     public function __clone()
     {
         $this->uuid   = null;
-        $this->entry  = new Carbon('now', new \DateTimeZone('UTC'));
+        $this->entry  = new Carbon('now');
         $this->status = self::STATUS_PENDING;
     }
 }

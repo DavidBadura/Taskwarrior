@@ -70,6 +70,9 @@ class CarbonHandler implements SubscribingHandlerInterface
      */
     public function serializeCarbon(VisitorInterface $visitor, Carbon $date, array $type, Context $context)
     {
+        $date = clone $date;
+        $date->setTimezone($this->defaultTimezone);
+
         return $visitor->visitString($date->format($this->getFormat($type)), $type, $context);
     }
 
@@ -93,6 +96,8 @@ class CarbonHandler implements SubscribingHandlerInterface
         if (false === $datetime) {
             throw new RuntimeException(sprintf('Invalid datetime "%s", expected format %s.', $data, $format));
         }
+
+        $datetime->setTimezone(new \DateTimeZone(date_default_timezone_get()));
 
         return $datetime;
     }
