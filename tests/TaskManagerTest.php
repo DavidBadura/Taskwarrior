@@ -193,7 +193,10 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $this->taskManager->save($task1);
 
         $this->assertInstanceOf('DateTime', $task1->getEntry());
-        $this->assertNull($task1->getModified());
+        $this->assertInstanceOf('DateTime', $task1->getModified());
+
+        $mod = $task1->getModified();
+        sleep(1);
 
         $task1->setDescription('bar2');
 
@@ -201,6 +204,8 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('DateTime', $task1->getEntry());
         $this->assertInstanceOf('DateTime', $task1->getModified());
+
+        $this->assertNotEquals($mod, $task1->getModified());
     }
 
     public function testEnd()

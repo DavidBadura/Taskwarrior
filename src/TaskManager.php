@@ -254,19 +254,21 @@ class TaskManager
      */
     private function edit(Task $task)
     {
-        $this->taskwarrior->modify(
-            [
-                'description' => $task->getDescription(),
-                'project'     => $task->getProject(),
-                'priority'    => $task->getPriority(),
-                'tags'        => $task->getTags(),
-                'due'         => $task->getDue() ? $task->getDue()->format('Ymd\THis\Z') : null,
-                'wait'        => $task->getWait() ? $task->getWait()->format('Ymd\THis\Z') : null,
-                'until'       => $task->getUntil() ? $task->getUntil()->format('Ymd\THis\Z') : null,
-                'recur'       => $task->getRecurring() ? $task->getRecurring()->getValue() : null,
-            ],
-            $task->getUuid()
-        );
+        $params = [
+            'description' => $task->getDescription(),
+            'project'     => $task->getProject(),
+            'priority'    => $task->getPriority(),
+            'tags'        => $task->getTags(),
+            'due'         => $task->getDue() ? $task->getDue()->format('Ymd\THis\Z') : null,
+            'wait'        => $task->getWait() ? $task->getWait()->format('Ymd\THis\Z') : null,
+            'until'       => $task->getUntil() ? $task->getUntil()->format('Ymd\THis\Z') : null
+        ];
+
+        if ($task->getRecurring()) {
+            $params['recur'] = $task->getRecurring()->getValue();
+        }
+
+        $this->taskwarrior->modify($params, $task->getUuid());
     }
 
     /**
