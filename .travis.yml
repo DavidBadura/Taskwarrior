@@ -19,8 +19,7 @@ before_install:
   - gunzip task-2.4.2.tar.gz
   - tar xf task-2.4.2.tar
   - cd task-2.4.2
-  - sudo apt-get install cmake build-essential uuid-dev libgnutls-dev libreadline6-dev
-  - sudo apt-get install -qq task --force-yes
+  - sudo apt-get install cmake build-essential uuid-dev libgnutls-dev libreadline6-dev --force-yes
   - sudo cmake -DCMAKE_BUILD_TYPE=release .
   - sudo make
   - sudo make install
