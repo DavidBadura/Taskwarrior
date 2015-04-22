@@ -35,7 +35,7 @@ class TaskwarriorTest extends \PHPUnit_Framework_TestCase
         $config = $this->taskwarrior->config();
 
         $this->assertInstanceOf('DavidBadura\Taskwarrior\Config', $config);
-        $this->assertTrue($config->has('alias._query'));
-        $this->assertEquals('export', $config->get('alias._query'));
+        $this->assertTrue($config->has('urgency.age.max'));
+        $this->assertEquals('365', $config->get('urgency.age.max'));
     }
 }
