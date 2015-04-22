@@ -196,7 +196,7 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('DateTime', $task1->getModified());
 
         $mod = $task1->getModified();
-        sleep(1);
+        sleep(2);
 
         $task1->setDescription('bar2');
 
