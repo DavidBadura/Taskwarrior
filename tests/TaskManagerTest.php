@@ -711,6 +711,15 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($task->getEnd());
     }
 
+    public function testComplexFilter()
+    {
+        $task1 = new Task();
+        $task1->setDescription('foo1');
+
+        $this->taskManager->save($task1);
+        $this->assertCount(1, $this->taskManager->filterAll('(status:pending or status:waiting)'));
+    }
+
     /**
      * @param string $string
      * @return \DateTime

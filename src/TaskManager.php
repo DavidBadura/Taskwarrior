@@ -90,15 +90,11 @@ class TaskManager
     }
 
     /**
-     * @param string|array $filter
+     * @param string $filter
      * @return Task[]|ArrayCollection
      */
     public function filterAll($filter = null)
     {
-        if (is_string($filter)) {
-            $filter = explode(' ', $filter);
-        }
-
         $result = $this->export($filter);
 
         foreach ($result as $key => $task) {

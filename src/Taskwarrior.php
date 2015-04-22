@@ -5,7 +5,7 @@ namespace DavidBadura\Taskwarrior;
 use DavidBadura\Taskwarrior\Exception\CommandException;
 use DavidBadura\Taskwarrior\Exception\TaskwarriorException;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Process\ProcessBuilder;
+use Symfony\Component\Process\Process;
 
 /**
  * @author David Badura <d.a.badura@gmail.com>
@@ -71,7 +71,7 @@ class Taskwarrior
 
     /**
      * @param array $params
-     * @param string|array $filter
+     * @param string $filter
      */
     public function modify(array $params, $filter = null)
     {
@@ -79,7 +79,7 @@ class Taskwarrior
     }
 
     /**
-     * @param null $filter
+     * @param string $filter
      * @return array
      */
     public function projects($filter = null)
@@ -90,7 +90,7 @@ class Taskwarrior
     }
 
     /**
-     * @param null $filter
+     * @param string $filter
      * @return array
      */
     public function tags($filter = null)
@@ -129,7 +129,7 @@ class Taskwarrior
     }
 
     /**
-     * @param string|array $filter
+     * @param string $filter
      * @return string
      */
     public function export($filter = null)
@@ -139,43 +139,34 @@ class Taskwarrior
 
     /**
      * @param string $command
-     * @param string|array $filter
+     * @param string $filter
      * @param array $options
      * @return string
      * @throws TaskwarriorException
      */
     public function command($command, $filter = null, array $options = array())
     {
-        $builder = $this->createProcessBuilder();
+        $parts = ['task'];
 
-        if (!is_array($filter)) {
-            $filter = explode(' ', $filter);
+        foreach ($this->rcOptions as $option) {
+            $parts[] = $option;
         }
 
-        foreach ($filter as $param) {
-            if (empty($param)) {
-                continue;
+        if ($filter) {
+            if (strpos($filter, '(') !== false) {
+                $parts[] = "'" . $filter . "'";
+            } else {
+                $parts[] = $filter;
             }
-
-            $builder->add($param);
         }
 
-        $builder->add($command);
+        $parts[] = $command;
 
         foreach ($options as $param) {
-            $builder->add($param);
+            $parts[] = $param;
         }
 
-        /*
-         * Local hack to allow utf8 chars
-         */
-        $oldLocal = setlocale(LC_CTYPE, 0);
-        setlocale(LC_CTYPE, 'UTF8', 'en_US.UTF-8');
-
-        $process = $builder->getProcess();
-
-        setlocale(LC_CTYPE, $oldLocal);
-
+        $process = new Process(implode(' ', $parts));
         $process->run();
 
         if (!$process->isSuccessful()) {
@@ -259,23 +250,6 @@ class Taskwarrior
         }
 
         return $options;
-    }
-
-    /**
-     * @return ProcessBuilder
-     */
-    private function createProcessBuilder()
-    {
-        $builder = new ProcessBuilder();
-
-        foreach ($this->rcOptions as $option) {
-            $builder->add($option);
-        }
-
-        $builder->setPrefix('task');
-        $builder->setTimeout(360);
-
-        return $builder;
     }
 
     /**

@@ -29,7 +29,6 @@ class TaskwarriorTest extends \PHPUnit_Framework_TestCase
         $fs->remove(__DIR__ . '/.task');
     }
 
-
     public function testConfig()
     {
         $config = $this->taskwarrior->config();
