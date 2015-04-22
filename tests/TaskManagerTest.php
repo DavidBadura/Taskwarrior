@@ -23,10 +23,20 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
      */
     protected $taskManager;
 
+    /**
+     * @var string
+     */
+    protected $taskDir;
+
     public function setUp()
     {
-        $this->tearDown();
-        $this->taskwarrior = new Taskwarrior(__DIR__ . '/.taskrc', __DIR__ . '/.task');
+        $this->taskDir = __DIR__;
+
+        $fs = new Filesystem();
+        $fs->remove($this->taskDir . '/.taskrc');
+        $fs->remove($this->taskDir . '/.task');
+
+        $this->taskwarrior = new Taskwarrior($this->taskDir . '/.taskrc', $this->taskDir . '/.task');
         $this->taskManager = new TaskManager($this->taskwarrior);
         $this->taskwarrior->version(); // to initialise
     }
@@ -34,8 +44,8 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
     public function tearDown()
     {
         $fs = new Filesystem();
-        $fs->remove(__DIR__ . '/.taskrc');
-        $fs->remove(__DIR__ . '/.task');
+        $fs->remove($this->taskDir . '/.taskrc');
+        $fs->remove($this->taskDir . '/.task');
     }
 
     public function testEmpty()
@@ -707,6 +717,6 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
      */
     private function createDateTime($string = 'now')
     {
-        return new \DateTime($string);
+        return new \Carbon\Carbon($string);
     }
 }
