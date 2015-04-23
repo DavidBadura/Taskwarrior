@@ -50,7 +50,7 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testEmpty()
     {
-        $tasks = $this->taskManager->filter();
+        $tasks = $this->taskManager->filterPending();
         $this->assertEmpty($tasks);
     }
 
@@ -123,7 +123,7 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->taskManager->save($task);
 
-        $result = $this->taskManager->filterAll($task->getUuid());
+        $result = $this->taskManager->filter($task->getUuid());
 
         $this->assertSame($task, $result[0]);
     }
@@ -147,14 +147,14 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $this->taskManager->save($task);
 
         $this->assertEquals($uuid, $task->getUuid());
-        $this->assertCount(1, $this->taskManager->filter());
+        $this->assertCount(1, $this->taskManager->filterPending());
 
         $this->taskManager->clear();
 
         $this->taskManager->save($task);
 
         $this->assertEquals($uuid, $task->getUuid());
-        $this->assertCount(1, $this->taskManager->filter());
+        $this->assertCount(1, $this->taskManager->filterPending());
     }
 
     public function testClone()
@@ -163,12 +163,12 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $task->setDescription('foo');
 
         $this->taskManager->save($task);
-        $this->assertCount(1, $this->taskManager->filter());
+        $this->assertCount(1, $this->taskManager->filterPending());
 
         $task2 = clone $task;
 
         $this->taskManager->save($task2);
-        $this->assertCount(2, $this->taskManager->filter());
+        $this->assertCount(2, $this->taskManager->filterPending());
 
         $this->taskManager->done($task);
         $this->isTrue($task->isCompleted());
@@ -194,7 +194,7 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $this->taskManager->save($task1);
         $this->taskManager->save($task2);
 
-        $result = $this->taskManager->filter();
+        $result = $this->taskManager->filterPending();
 
         $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $result);
         $this->assertCount(2, $result);
@@ -214,7 +214,7 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $this->taskManager->save($task1);
         $this->taskManager->save($task2);
 
-        $this->assertCount(1, $this->taskManager->filter('project:home prio:H +now'));
+        $this->assertCount(1, $this->taskManager->filterPending('project:home prio:H +now'));
     }
 
     public function testModified()
@@ -306,7 +306,7 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(Task::STATUS_PENDING, $result->getStatus());
         $this->assertTrue($result->isPending());
 
-        $this->assertCount(1, $this->taskManager->filter());
+        $this->assertCount(1, $this->taskManager->filterPending());
     }
 
     public function testDelete()
@@ -314,17 +314,17 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $task1 = new Task();
         $task1->setDescription('foo1');
 
-        $this->assertCount(0, $this->taskManager->filter());
+        $this->assertCount(0, $this->taskManager->filterPending());
 
         $this->taskManager->save($task1);
-        $this->assertCount(1, $this->taskManager->filterAll());
         $this->assertCount(1, $this->taskManager->filter());
+        $this->assertCount(1, $this->taskManager->filterPending());
         $this->assertFalse($task1->isDeleted());
         $this->assertEquals(Task::STATUS_PENDING, $task1->getStatus());
 
         $this->taskManager->delete($task1);
-        $this->assertCount(1, $this->taskManager->filterAll());
-        $this->assertCount(0, $this->taskManager->filter());
+        $this->assertCount(1, $this->taskManager->filter());
+        $this->assertCount(0, $this->taskManager->filterPending());
         $this->assertTrue($task1->isDeleted());
         $this->assertEquals(Task::STATUS_DELETED, $task1->getStatus());
     }
@@ -334,17 +334,17 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $task1 = new Task();
         $task1->setDescription('foo1');
 
-        $this->assertCount(0, $this->taskManager->filter());
+        $this->assertCount(0, $this->taskManager->filterPending());
 
         $this->taskManager->save($task1);
-        $this->assertCount(1, $this->taskManager->filterAll());
         $this->assertCount(1, $this->taskManager->filter());
+        $this->assertCount(1, $this->taskManager->filterPending());
         $this->assertFalse($task1->isCompleted());
         $this->assertEquals(Task::STATUS_PENDING, $task1->getStatus());
 
         $this->taskManager->done($task1);
-        $this->assertCount(1, $this->taskManager->filterAll());
-        $this->assertCount(0, $this->taskManager->filter());
+        $this->assertCount(1, $this->taskManager->filter());
+        $this->assertCount(0, $this->taskManager->filterPending());
         $this->assertTrue($task1->isCompleted());
         $this->assertEquals(Task::STATUS_COMPLETED, $task1->getStatus());
     }
@@ -439,18 +439,18 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('home', $task1->getProject());
         $this->assertEquals('office', $task2->getProject());
 
-        $this->assertCount(2, $this->taskManager->filter());
-        $this->assertCount(1, $this->taskManager->filter('project:home'));
-        $this->assertCount(1, $this->taskManager->filter('project:office'));
-        $this->assertCount(0, $this->taskManager->filter('project:hobby'));
+        $this->assertCount(2, $this->taskManager->filterPending());
+        $this->assertCount(1, $this->taskManager->filterPending('project:home'));
+        $this->assertCount(1, $this->taskManager->filterPending('project:office'));
+        $this->assertCount(0, $this->taskManager->filterPending('project:hobby'));
 
         $task2->setProject('home');
         $this->taskManager->save($task2);
 
-        $this->assertCount(2, $this->taskManager->filter());
-        $this->assertCount(2, $this->taskManager->filter('project:home'));
-        $this->assertCount(0, $this->taskManager->filter('project:office'));
-        $this->assertCount(0, $this->taskManager->filter('project:hobby'));
+        $this->assertCount(2, $this->taskManager->filterPending());
+        $this->assertCount(2, $this->taskManager->filterPending('project:home'));
+        $this->assertCount(0, $this->taskManager->filterPending('project:office'));
+        $this->assertCount(0, $this->taskManager->filterPending('project:hobby'));
     }
 
     public function testProjects()
@@ -521,8 +521,8 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
 
         $task1 = $this->taskManager->find($task1->getUuid());
         $this->assertEquals(array('b', 'c', 'd'), $task1->getTags());
-        $this->assertCount(0, $this->taskManager->filter('+a'));
-        $this->assertCount(1, $this->taskManager->filter('+b'));
+        $this->assertCount(0, $this->taskManager->filterPending('+a'));
+        $this->assertCount(1, $this->taskManager->filterPending('+b'));
     }
 
     public function testTagUnicode()
@@ -538,7 +538,7 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('später'), $task1->getTags());
         $this->assertEquals(array('später'), $this->taskwarrior->tags());
 
-        $this->assertCount(1,$this->taskManager->filter('+später'));
+        $this->assertCount(1,$this->taskManager->filterPending('+später'));
     }
 
     public function testWait()
@@ -556,12 +556,12 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $this->taskManager->save($task1);
         $this->assertTrue($task1->isWaiting());
 
-        $this->assertCount(0, $this->taskManager->filter());
-        $this->assertCount(1, $this->taskManager->filterAll('status:waiting'));
+        $this->assertCount(0, $this->taskManager->filterPending());
+        $this->assertCount(1, $this->taskManager->filter('status:waiting'));
 
         sleep(3);
 
-        $this->assertCount(1, $this->taskManager->filter());
+        $this->assertCount(1, $this->taskManager->filterPending());
         $this->assertFalse($task1->isWaiting());
     }
 
@@ -574,11 +574,11 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->taskManager->save($task1);
 
-        $this->assertCount(2, $this->taskManager->filterAll());
+        $this->assertCount(2, $this->taskManager->filter());
 
         $this->assertTrue($task1->isRecurring());
 
-        $result = $this->taskManager->filter();
+        $result = $this->taskManager->filterPending();
         $this->assertCount(1, $result);
 
         $this->assertTrue($result[0]->isPending());
@@ -640,7 +640,7 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->taskManager->save($task1);
 
-        $this->assertCount(1, $this->taskManager->filterAll());
+        $this->assertCount(1, $this->taskManager->filter());
     }
 
     public function testRecurringModify()
@@ -680,15 +680,15 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $this->taskManager->save($task1);
         $this->taskManager->clear();
 
-        $this->assertCount(1, $this->taskManager->filterAll('status:recurring'));
-        $this->assertCount(2, $this->taskManager->filterAll());
+        $this->assertCount(1, $this->taskManager->filter('status:recurring'));
+        $this->assertCount(2, $this->taskManager->filter());
 
         $this->taskManager->delete($task1);
 
         $this->taskManager->clear();
 
-        $this->assertCount(0, $this->taskManager->filterAll('status:recurring'));
-        $this->assertCount(2, $this->taskManager->filterAll());
+        $this->assertCount(0, $this->taskManager->filter('status:recurring'));
+        $this->assertCount(2, $this->taskManager->filter());
     }
 
     public function testUntil()
@@ -699,11 +699,11 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->taskManager->save($task1);
 
-        $this->assertCount(1, $this->taskManager->filter());
+        $this->assertCount(1, $this->taskManager->filterPending());
 
         sleep(3);
 
-        $this->assertCount(0, $this->taskManager->filter());
+        $this->assertCount(0, $this->taskManager->filterPending());
     }
 
 
@@ -763,7 +763,8 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $task1->setDescription('foo1');
 
         $this->taskManager->save($task1);
-        $this->assertCount(1, $this->taskManager->filterAll('(status:pending or status:waiting)'));
+        $this->assertCount(1, $this->taskManager->filter('(status:pending or status:waiting)'));
+        $this->assertCount(1, $this->taskManager->filterPending('(status:pending or status:waiting)'));
     }
 
     /**

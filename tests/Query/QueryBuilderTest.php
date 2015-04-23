@@ -1,6 +1,6 @@
 <?php
 
-namespace DavidBadura\Taskwarrior\Test;
+namespace DavidBadura\Taskwarrior\Test\Query;
 
 use DavidBadura\Taskwarrior\Query\QueryBuilder;
 
@@ -32,6 +32,6 @@ class QueryBuilderTest extends \PHPUnit_Framework_TestCase
             ->wherePriority('testPriority')
             ->getFilter();
 
-        $this->assertEquals('project:testProject +testTag status:testStatus priority:testPriority', $filter);
+        $this->assertEquals(['project:testProject', '+testTag', 'status:testStatus', 'priority:testPriority'], $filter);
     }
 }

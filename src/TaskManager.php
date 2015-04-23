@@ -79,7 +79,7 @@ class TaskManager
             return $this->tasks[$uuid];
         }
 
-        $tasks = $this->filterAll($uuid);
+        $tasks = $this->filter($uuid);
 
         if (count($tasks) == 0) {
             return null;
@@ -96,7 +96,7 @@ class TaskManager
      * @param string $filter
      * @return Task[]|ArrayCollection
      */
-    public function filterAll($filter = null)
+    public function filter($filter = null)
     {
         $result = $this->export($filter);
 
@@ -119,9 +119,9 @@ class TaskManager
      * @param string|array $filter
      * @return Task[]|ArrayCollection
      */
-    public function filter($filter = null)
+    public function filterPending($filter = null)
     {
-        return $this->filterAll($filter . ' status:pending');
+        return $this->filter(array_merge((array)$filter, ['status:pending']));
     }
 
     /**
@@ -220,15 +220,6 @@ class TaskManager
     }
 
     /**
-     * @param Task $task
-     */
-    public function refresh(Task $task)
-    {
-        $clean = $this->export($task->getUuid())[0];
-        $this->merge($task, $clean);
-    }
-
-    /**
      *
      */
     public function clear()
@@ -275,6 +266,15 @@ class TaskManager
         return $this->createQueryBuilder()
             ->where($context->filter)
             ->getResult();
+    }
+
+    /**
+     * @param Task $task
+     */
+    private function refresh(Task $task)
+    {
+        $clean = $this->export($task->getUuid())[0];
+        $this->merge($task, $clean);
     }
 
     /**

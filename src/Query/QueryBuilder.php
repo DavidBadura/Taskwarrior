@@ -195,7 +195,7 @@ class QueryBuilder
      */
     public function getFilter()
     {
-        return implode(' ', $this->filter);
+        return $this->filter;
     }
 
     /**
@@ -203,7 +203,7 @@ class QueryBuilder
      */
     public function getResult()
     {
-        $result = $this->taskManager->filter($this->getFilter());
+        $result = $this->taskManager->filter($this->filter);
 
         return $result->matching($this->criteria);
     }

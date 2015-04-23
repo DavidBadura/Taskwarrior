@@ -10,7 +10,7 @@
 composer require 'davidbadura/taskwarrior'
 ```
 
-**Requirements: Taskwarrior >=2.1**
+**Requirements: Taskwarrior >=2.4**
 
 ## Usage
 
@@ -31,20 +31,131 @@ $task->setRecurring(Recurring::DAILY);
 
 $tm->save($task);
 
-$tasks = $tm->filter('project:hobby'); // one task
+$tasks = $tm->filterPending('project:hobby'); // one task
 
 $tm->done($task);
 
-$tasks = $tm->filter('project:hobby'); // empty
+$tasks = $tm->filterPending('project:hobby'); // empty
+$tasks = $tm->filter('project:hobby'); // one task
 
-$tasks = $tm->filterByReport('waiting'); 
+$tasks = $tm->filterByReport('waiting'); // and sorting
 ```
 
 ## API
 
-todo...
+### Task
+
+|attr|writeable|type|
+|----|---------|----|
+|uuid|false|string|
+|description|true|string|
+|priority|true|string|
+|project|true|string|
+|due|true|DateTime|
+|wait|true|DateTime|
+|tags|true|string[]|
+|urgency|false|float|
+|entry|false|DateTime|
+|start|false|DateTime|
+|recur|true|Recurring|
+|unti|true|DateTime|
+|modified|false|DateTime|
+|end|false|DateTime|
+|status|false|string|
+
+Example:
+
+```php
+$task = new Task();
+$task->setDescription('program this lib');
+$task->setProject('hobby');
+$task->setDue('tomorrow');
+$task->setPriority(Task::PRIORITY_HIGH);
+$task->addTag('next');
+$task->setRecurring(Recurring::DAILY);
+```
+
+### Taskwarrior
+
+create TaskManager:
+
+```php
+$tm = TaskManager::create();
+```
+
+save a task:
+
+```php
+$task = new Task();
+$task->setDescription('foo');
+$tm->save($task);
+```
+
+save a task:
+
+```php
+$task = new Task();
+$task->setDescription('foo');
+$tm->save($task);
+```
+
+find a task:
+
+```php
+$task = $tm->find('b1d46c75-63cc-4753-a20f-a0b376f1ead0');
+```
+
+filter tasks:
+
+```php
+$tasks = $tm->filter('status:pending');
+$tasks = $tm->filter('status:pending +home');
+$tasks = $tm->filter('status:pending and +home');
+$tasks = $tm->filter(['status:pending', '+home']);
+```
+
+filter pending tasks:
+
+```php
+$tasks = $tm->filterPending('+home');
+$tasks = $tm->filterPending('project:hobby +home');
+$tasks = $tm->filterPending('project:hobby and +home');
+$tasks = $tm->filterPending(['project:hobby', '+home']);
+```
+
+delete task:
+
+```php
+$tm->delete($task);
+```
+
+done task:
+
+```php
+$tm->done($task);
+```
+
+start task:
+
+```php
+$tm->start($task);
+```
+
+stop task:
+
+```php
+$tm->stop($task);
+```
+
+reopen task:
+
+```php
+$tm->reopen($task);
+```
 
 ### QueryBuilder
+
+example:
 
 ```php
 $tasks = $taskManager->createQueryBuilder()

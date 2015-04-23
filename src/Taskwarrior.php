@@ -47,7 +47,7 @@ class Taskwarrior
     }
 
     /**
-     * @param string $filter
+     * @param string|string[] $filter
      */
     public function delete($filter)
     {
@@ -55,7 +55,7 @@ class Taskwarrior
     }
 
     /**
-     * @param string $filter
+     * @param string|string[] $filter
      */
     public function done($filter)
     {
@@ -63,7 +63,7 @@ class Taskwarrior
     }
 
     /**
-     * @param string $filter
+     * @param string|string[] $filter
      */
     public function start($filter)
     {
@@ -71,7 +71,7 @@ class Taskwarrior
     }
 
     /**
-     * @param string $filter
+     * @param string|string[] $filter
      */
     public function stop($filter)
     {
@@ -88,7 +88,7 @@ class Taskwarrior
 
     /**
      * @param array $params
-     * @param string $filter
+     * @param string|string[] $filter
      */
     public function modify(array $params, $filter = null)
     {
@@ -96,7 +96,7 @@ class Taskwarrior
     }
 
     /**
-     * @param string $filter
+     * @param string|string[] $filter
      * @return array
      */
     public function projects($filter = null)
@@ -107,7 +107,7 @@ class Taskwarrior
     }
 
     /**
-     * @param string $filter
+     * @param string|string[] $filter
      * @return array
      */
     public function tags($filter = null)
@@ -146,7 +146,7 @@ class Taskwarrior
     }
 
     /**
-     * @param string $filter
+     * @param string|string[] $filter
      * @return string
      */
     public function export($filter = null)
@@ -156,7 +156,7 @@ class Taskwarrior
 
     /**
      * @param string $command
-     * @param string $filter
+     * @param string|string[] $filter
      * @param array $options
      * @return string
      * @throws TaskwarriorException
@@ -170,7 +170,9 @@ class Taskwarrior
         }
 
         if ($filter) {
-            $parts[] = "( " . $filter . ' )';
+            foreach((array)$filter as $f) {
+                $parts[] = "( " . $f . ' )';
+            }
         }
 
         $parts[] = $command;
