@@ -158,6 +158,32 @@ class TaskManager
     /**
      * @param Task $task
      */
+    public function start(Task $task)
+    {
+        if (!$task->getUuid()) {
+            return;
+        }
+
+        $this->taskwarrior->start($task->getUuid());
+        $this->refresh($task);
+    }
+
+    /**
+     * @param Task $task
+     */
+    public function stop(Task $task)
+    {
+        if (!$task->getUuid()) {
+            return;
+        }
+
+        $this->taskwarrior->stop($task->getUuid());
+        $this->refresh($task);
+    }
+
+    /**
+     * @param Task $task
+     */
     public function reopen(Task $task)
     {
         if (!$task->getUuid()) {
@@ -313,6 +339,7 @@ class TaskManager
         $this->setValue($old, 'urgency', $new->getUrgency());
         $this->setValue($old, 'status', $new->getStatus());
         $this->setValue($old, 'modified', $new->getModified());
+        $this->setValue($old, 'start', $new->getStart());
 
         if ($new->isPending()) { // fix reopen problem
             $this->setValue($old, 'end', null);

@@ -270,6 +270,26 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('DateTime', $task1->getEnd());
     }
 
+    public function testStart()
+    {
+        $task1 = new Task();
+        $task1->setDescription('foo1');
+
+        $this->taskManager->save($task1);
+
+        $this->assertNull($task1->getStart());
+
+        $this->taskManager->start($task1);
+        $this->taskManager->save($task1);
+
+        $this->assertInstanceOf('DateTime', $task1->getStart());
+
+        $this->taskManager->stop($task1);
+        $this->taskManager->save($task1);
+
+        $this->assertNull($task1->getStart());
+    }
+
     public function testPending()
     {
         $task1 = new Task();

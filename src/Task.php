@@ -85,6 +85,13 @@ class Task
     private $entry;
 
     /**
+     * @var Carbon
+     *
+     * @JMS\Type("Carbon")
+     */
+    private $start;
+
+    /**
      * @var string
      *
      * @JMS\Type("Recurring")
@@ -186,7 +193,7 @@ class Task
     }
 
     /**
-     * @return \DateTime
+     * @return Carbon
      */
     public function getDue()
     {
@@ -202,7 +209,7 @@ class Task
     }
 
     /**
-     * @return \DateTime
+     * @return Carbon
      */
     public function getWait()
     {
@@ -284,7 +291,7 @@ class Task
     }
 
     /**
-     * @return \DateTime
+     * @return Carbon
      */
     public function getUntil()
     {
@@ -300,7 +307,7 @@ class Task
     }
 
     /**
-     * @return \DateTime
+     * @return Carbon
      */
     public function getEntry()
     {
@@ -308,7 +315,15 @@ class Task
     }
 
     /**
-     * @return \DateTime
+     * @return Carbon
+     */
+    public function getStart()
+    {
+        return $this->start;
+    }
+
+    /**
+     * @return Carbon
      */
     public function getModified()
     {

@@ -63,6 +63,22 @@ class Taskwarrior
     }
 
     /**
+     * @param string $filter
+     */
+    public function start($filter)
+    {
+        $this->command('start', $filter);
+    }
+
+    /**
+     * @param string $filter
+     */
+    public function stop($filter)
+    {
+        $this->command('stop', $filter);
+    }
+
+    /**
      * @param array $params
      */
     public function add(array $params)
