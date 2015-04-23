@@ -47,6 +47,6 @@ todo...
 ```php
 $tasks = $taskManager->createQueryBuilder()
     ->whereProject('hobby')
-    ->sortBy(QueryBuilder::SORT_ENTRY)
+    ->orderBy(['entry' => 'DESC'])
     ->getResult()
 ```
