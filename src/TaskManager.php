@@ -3,6 +3,7 @@
 namespace DavidBadura\Taskwarrior;
 
 use DavidBadura\Taskwarrior\Exception\TaskwarriorException;
+use DavidBadura\Taskwarrior\Query\QueryBuilder;
 use DavidBadura\Taskwarrior\Serializer\Handler\CarbonHandler;
 use DavidBadura\Taskwarrior\Serializer\Handler\RecurringHandler;
 use Doctrine\Common\Collections\ArrayCollection;

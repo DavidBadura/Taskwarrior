@@ -2,7 +2,7 @@
 
 namespace DavidBadura\Taskwarrior\Test;
 
-use DavidBadura\Taskwarrior\QueryBuilder;
+use DavidBadura\Taskwarrior\Query\QueryBuilder;
 
 /**
  * @author David Badura <badura@simplethings.de>

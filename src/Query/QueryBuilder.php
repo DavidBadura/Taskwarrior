@@ -1,7 +1,9 @@
 <?php
 
-namespace DavidBadura\Taskwarrior;
+namespace DavidBadura\Taskwarrior\Query;
 
+use DavidBadura\Taskwarrior\Task;
+use DavidBadura\Taskwarrior\TaskManager;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
 

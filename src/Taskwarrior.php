@@ -2,6 +2,7 @@
 
 namespace DavidBadura\Taskwarrior;
 
+use DavidBadura\Taskwarrior\Config\Config;
 use DavidBadura\Taskwarrior\Exception\CommandException;
 use DavidBadura\Taskwarrior\Exception\TaskwarriorException;
 use Symfony\Component\Filesystem\Filesystem;
