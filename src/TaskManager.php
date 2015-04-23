@@ -2,6 +2,8 @@
 
 namespace DavidBadura\Taskwarrior;
 
+use DavidBadura\Taskwarrior\Config\Context;
+use DavidBadura\Taskwarrior\Config\Report;
 use DavidBadura\Taskwarrior\Exception\TaskwarriorException;
 use DavidBadura\Taskwarrior\Query\QueryBuilder;
 use DavidBadura\Taskwarrior\Serializer\Handler\CarbonHandler;
@@ -219,6 +221,39 @@ class TaskManager
     public function createQueryBuilder()
     {
         return new QueryBuilder($this);
+    }
+
+    /**
+     * @param Report|string $report
+     * @return Task[]|ArrayCollection
+     * @throws Exception\ConfigException
+     */
+    public function filterByReport($report)
+    {
+        if (!$report instanceof Report) {
+            $report = $this->taskwarrior->config()->getReport($report);
+        }
+
+        return $this->createQueryBuilder()
+            ->where($report->filter)
+            ->orderBy($report->sort)
+            ->getResult();
+    }
+
+    /**
+     * @param Context|string $context
+     * @return Task[]|ArrayCollection
+     * @throws Exception\ConfigException
+     */
+    public function filterByContext($context)
+    {
+        if (!$context instanceof Report) {
+            $context = $this->taskwarrior->config()->getContext($context);
+        }
+
+        return $this->createQueryBuilder()
+            ->where($context->filter)
+            ->getResult();
     }
 
     /**

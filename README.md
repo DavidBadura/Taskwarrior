@@ -36,6 +36,8 @@ $tasks = $tm->filter('project:hobby'); // one task
 $tm->done($task);
 
 $tasks = $tm->filter('project:hobby'); // empty
+
+$tasks = $tm->filterByReport('waiting'); 
 ```
 
 ## API
