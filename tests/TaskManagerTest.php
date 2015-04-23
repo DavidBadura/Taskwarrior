@@ -69,6 +69,32 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($task, $result);
     }
 
+    public function testUrlInDescription()
+    {
+        $task = new Task();
+        $task->setDescription('hier http://google.de ');
+
+        $this->taskManager->save($task);
+        $this->taskManager->clear();
+
+        $result = $this->taskManager->find($task->getUuid());
+
+        $this->assertEquals('hier http://google.de ', $result->getDescription());
+    }
+
+    public function testQuoteInDescription()
+    {
+        $task = new Task();
+        $task->setDescription(" test ' foo ");
+
+        $this->taskManager->save($task);
+        $this->taskManager->clear();
+
+        $result = $this->taskManager->find($task->getUuid());
+
+        $this->assertEquals(" test ' foo ", $result->getDescription());
+    }
+
     public function testSaveTaskWithoutDescription()
     {
         $this->setExpectedException('DavidBadura\Taskwarrior\Exception\TaskwarriorException');

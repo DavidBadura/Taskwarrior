@@ -117,7 +117,7 @@ class Taskwarrior
         $file = tempnam(sys_get_temp_dir(), 'task') . '.json';
         $fs->dumpFile($file, $json);
 
-        $output = $this->command('import', $file);
+        $output = $this->command('import', null, [$file]);
 
         $fs->remove($file);
 
@@ -153,11 +153,7 @@ class Taskwarrior
         }
 
         if ($filter) {
-            if (strpos($filter, '(') !== false) {
-                $parts[] = "'" . $filter . "'";
-            } else {
-                $parts[] = $filter;
-            }
+            $parts[] = "( " . $filter . ' )';
         }
 
         $parts[] = $command;
@@ -166,7 +162,7 @@ class Taskwarrior
             $parts[] = $param;
         }
 
-        $process = new Process(implode(' ', $parts));
+        $process = new Process($this->createCommandLine($parts));
         $process->run();
 
         if (!$process->isSuccessful()) {
@@ -181,11 +177,11 @@ class Taskwarrior
      */
     public function version()
     {
-        if ($this->version) {
-            return $this->version;
+        if (!$this->version) {
+            $this->version = trim($this->command('_version'));
         }
 
-        return $this->version = trim($this->command('_version'));
+        return $this->version;
     }
 
     /**
@@ -259,6 +255,19 @@ class Taskwarrior
     private function parseResult($string)
     {
         return array_filter(explode("\n", $string), 'strlen');
+    }
+
+    /**
+     * @param array $parts
+     * @return string
+     */
+    private function createCommandLine(array $parts)
+    {
+        $parts = array_map(function($part) {
+            return "'" . str_replace("'", "'\\''", $part) . "'";
+        }, $parts);
+
+        return implode(' ', $parts);
     }
 
     /**
