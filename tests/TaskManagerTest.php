@@ -670,8 +670,6 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testRecurringDelete()
     {
-        $this->markTestIncomplete('not working yet');
-
         $recur1 = new Recurring(Recurring::DAILY);
 
         $task1 = new Task();
@@ -683,12 +681,14 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $this->taskManager->clear();
 
         $this->assertCount(1, $this->taskManager->filterAll('status:recurring'));
+        $this->assertCount(2, $this->taskManager->filterAll());
 
         $this->taskManager->delete($task1);
 
         $this->taskManager->clear();
 
         $this->assertCount(0, $this->taskManager->filterAll('status:recurring'));
+        $this->assertCount(2, $this->taskManager->filterAll());
     }
 
     public function testUntil()

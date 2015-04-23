@@ -133,13 +133,8 @@ class TaskManager
             return;
         }
 
-        if ($task->isRecurring()) {
-            $task->setUntil('now');
-            $this->save($task);
-        } else {
-            $this->taskwarrior->delete($task->getUuid());
-            $this->refresh($task);
-        }
+        $this->taskwarrior->delete($task->getUuid());
+        $this->refresh($task);
     }
 
     /**
