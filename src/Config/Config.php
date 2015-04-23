@@ -288,7 +288,7 @@ class Config implements \IteratorAggregate, \Countable
                 continue;
             }
 
-            str_replace('/', '', $part); // fix "report.minimal.sort=project+/,description+"
+            $part = str_replace('/', '', $part); // fix "report.minimal.sort=project+/,description+"
 
             $order[substr($part, 0, -1)] = substr($part, -1) == '+' ? Criteria::ASC : Criteria::DESC;
         }
