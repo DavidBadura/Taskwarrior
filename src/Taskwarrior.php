@@ -169,8 +169,10 @@ class Taskwarrior
             $parts[] = $option;
         }
 
+        $filter = array_filter((array)$filter, 'trim');
+
         if ($filter) {
-            foreach((array)$filter as $f) {
+            foreach($filter as $f) {
                 $parts[] = "( " . $f . ' )';
             }
         }
