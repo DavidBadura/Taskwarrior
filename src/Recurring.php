@@ -16,6 +16,8 @@ class Recurring
     const WEEKDAYS   = 'weekdays';
     const WEEKLY     = 'weekly';
     const BIWEEKLY   = 'biweekly';
+    const MONTHLY    = 'monthly';
+    const BIMONTHLY  = 'bimonthly';
     const QUARTERLY  = 'quarterly';
     const SEMIANNUAL = 'semiannual';
     const ANNUAL     = 'annual';
@@ -70,19 +72,48 @@ class Recurring
             return true;
         }
 
-        if (preg_match('/^[0-9]+d$/', $recur)) {
+        // seconds
+        if (preg_match('/^[0-9]*\s?se?c?o?n?d?s?$/', $recur)) {
             return true;
         }
 
-        if (preg_match('/^[0-9]+w$/', $recur)) {
+        // minutes
+        if (preg_match('/^[0-9]*\s?mi?n?u?t?e?s?$/', $recur)) {
             return true;
         }
 
-        if (preg_match('/^[0-9]+q$/', $recur)) {
+        // hours
+        if (preg_match('/^[0-9]*\s?ho?u?r?s?$/', $recur)) {
             return true;
         }
 
-        if (preg_match('/^[0-9]+y$/', $recur)) {
+        // days
+        if (preg_match('/^[0-9]*\s?da?y?s?$/', $recur)) {
+            return true;
+        }
+
+        // weeks
+        if (preg_match('/^[0-9]*\s?we?e?k?s?$/', $recur)) {
+            return true;
+        }
+
+        // months
+        if (preg_match('/^[0-9]*\s?mo?n?t?h?s?$/', $recur)) {
+            return true;
+        }
+
+        // quarters
+        if (preg_match('/^[0-9]*\s?qu?a?r?t?e?r?(s|ly)?/', $recur)) {
+            return true;
+        }
+
+        // years
+        if (preg_match('/^[0-9]*\s?ye?a?r?s?$/', $recur)) {
+            return true;
+        }
+
+        // fortnight | sennight
+        if (preg_match('/^[0-9]*\s?(fortnight|sennight)$/', $recur)) {
             return true;
         }
 

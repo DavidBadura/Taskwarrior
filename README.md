@@ -12,7 +12,7 @@ composer require 'davidbadura/taskwarrior'
 
 ## Requirements
 
-Task Warrior changes its behavior by patch level updates and it is very difficult to support all versions.
+Taskwarrior changes its behavior by patch level updates and it is very difficult to support all versions.
 That's why I've decided just to support only one version: **2.4.3**
 
 ## Usage
