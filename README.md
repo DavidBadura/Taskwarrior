@@ -1,5 +1,7 @@
 # Taskwarrior PHP lib
 
+used by [doThings](https://travis-ci.org/DavidBadura/doThings) - a Taskwarrior web-ui.
+
 [![Build Status](https://travis-ci.org/DavidBadura/Taskwarrior.svg?branch=master)](https://travis-ci.org/DavidBadura/Taskwarrior)
 
 ![WOW](http://i.imgur.com/mvSQh0M.gif)
