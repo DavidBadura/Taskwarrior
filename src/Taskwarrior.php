@@ -21,6 +21,11 @@ class Taskwarrior
     /**
      * @var string
      */
+    private $bin;
+
+    /**
+     * @var string
+     */
     private $version;
 
     /**
@@ -32,9 +37,11 @@ class Taskwarrior
      * @param string $taskrc
      * @param string $taskData
      * @param array $rcOptions
+     * @param string $bin
      */
-    public function __construct($taskrc = '~/.taskrc', $taskData = '~/.task', $rcOptions = [])
+    public function __construct($taskrc = '~/.taskrc', $taskData = '~/.task', $rcOptions = [], $bin = 'task')
     {
+        $this->bin       = $bin;
         $this->rcOptions = array_merge(
             array(
                 'rc:' . $taskrc,
@@ -163,7 +170,7 @@ class Taskwarrior
      */
     public function command($command, $filter = null, array $options = array())
     {
-        $parts = ['task'];
+        $parts = [$this->bin];
 
         foreach ($this->rcOptions as $option) {
             $parts[] = $option;
