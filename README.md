@@ -12,7 +12,7 @@ used by [doThings](https://github.com/DavidBadura/doThings) - a Taskwarrior web-
 composer require 'davidbadura/taskwarrior'
 ```
 
-Unfortunately, the annotation reader is not automatically registered on composer. So you should add following line:
+Unfortunately, the annotation reader is not automatically registered on composer. So you should add following line if you have `[Semantical Error] The annotation "@JMS\Serializer\Annotation\Type" in property [...] does not exist, or could not be auto-loaded.` exception:
 
 ```php
 \Doctrine\Common\Annotations\AnnotationRegistry::registerLoader('class_exists');
