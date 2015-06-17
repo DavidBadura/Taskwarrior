@@ -12,6 +12,12 @@ used by [doThings](https://github.com/DavidBadura/doThings) - a Taskwarrior web-
 composer require 'davidbadura/taskwarrior'
 ```
 
+Unfortunately, the annotation reader is not automatically registered on composer. So you should add following line:
+
+```php
+\Doctrine\Common\Annotations\AnnotationRegistry::registerLoader('class_exists');
+```
+
 ## Requirements
 
 Taskwarrior changes its behavior by patch level updates and it is very difficult to support all versions.
