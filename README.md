@@ -94,13 +94,6 @@ create TaskManager:
 $tm = TaskManager::create();
 ```
 
-save a task:
-
-```php
-$task = new Task();
-$task->setDescription('foo');
-$tm->save($task);
-```
 
 save a task:
 
