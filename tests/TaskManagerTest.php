@@ -549,6 +549,18 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(1,$this->taskManager->filterPending('+später'));
     }
 
+    public function testTagNameNotAllowed()
+    {
+        $this->setExpectedException('DavidBadura\Taskwarrior\Exception\TaskwarriorException',
+            "Tag with the name 'foo-bar' is not allowed");
+
+        $task1 = new Task();
+        $task1->setDescription('foo1');
+        $task1->addTag('foo-bar');
+
+        $this->taskManager->save($task1);
+    }
+
     public function testWait()
     {
         $task1 = new Task();

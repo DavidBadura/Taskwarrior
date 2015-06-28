@@ -21,6 +21,8 @@ use JMS\Serializer\SerializerBuilder;
  */
 class TaskManager
 {
+    const PATTERN = '/^[\wäüö]*$/i';
+
     /**
      * @var Taskwarrior
      */
@@ -214,6 +216,16 @@ class TaskManager
 
         if ($task->getRecurring() && !$task->getDue()) {
             $errors[] = "A recurring task must also have a 'due' date.";
+        }
+
+        if (!preg_match(static::PATTERN, $task->getProject())) {
+            $errors[] = sprintf("Project with the name '%s' is not allowed", $task->getProject());
+        }
+
+        foreach ($task->getTags() as $tag) {
+            if (!preg_match(static::PATTERN, $tag)) {
+                $errors[] = sprintf("Tag with the name '%s' is not allowed", $tag);
+            }
         }
 
         return $errors;
