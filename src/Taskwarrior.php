@@ -180,7 +180,7 @@ class Taskwarrior
 
         if ($filter) {
             foreach($filter as $f) {
-                $parts[] = "( " . $f . ' )';
+                $parts[] = "( " . $f . " )";
             }
         }
 
@@ -270,7 +270,7 @@ class Taskwarrior
         }
 
         if (array_key_exists('description', $params)) {
-            $options[] = $params['description'];
+            $options[] = 'description:' . $params['description'];
         }
 
         return $options;

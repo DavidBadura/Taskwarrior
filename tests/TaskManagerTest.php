@@ -69,30 +69,38 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($task, $result);
     }
 
-    public function testUrlInDescription()
+    public function provideDescriptions()
     {
-        $task = new Task();
-        $task->setDescription('hier http://google.de ');
-
-        $this->taskManager->save($task);
-        $this->taskManager->clear();
-
-        $result = $this->taskManager->find($task->getUuid());
-
-        $this->assertEquals('hier http://google.de ', $result->getDescription());
+        return array(
+            array('hier http://google.de'),
+            array("test ' foo"),
+            array("test (foo) bar"),
+            array("foo-bar"),
+            array("test +bar")
+        );
     }
 
-    public function testQuoteInDescription()
+    /**
+     * @dataProvider provideDescriptions
+     */
+    public function testDescription($description)
     {
         $task = new Task();
-        $task->setDescription(" test ' foo ");
+        $task->setDescription($description);
 
         $this->taskManager->save($task);
         $this->taskManager->clear();
 
-        $result = $this->taskManager->find($task->getUuid());
+        $task = $this->taskManager->find($task->getUuid());
 
-        $this->assertEquals(" test ' foo ", $result->getDescription());
+        $this->assertEquals($description, $task->getDescription());
+
+        $this->taskManager->save($task);
+        $this->taskManager->clear();
+
+        $task = $this->taskManager->find($task->getUuid());
+
+        $this->assertEquals($description, $task->getDescription());
     }
 
     public function testSaveTaskWithoutDescription()
