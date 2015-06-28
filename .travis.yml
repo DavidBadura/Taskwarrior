@@ -15,13 +15,21 @@ env:
       - PREFER_LOWEST=""
     include:
       - php: 5.6
-        env: TASKWARRIOR=2.4.0
+        env:
+          - TASKWARRIOR=2.4.0
+          - PREFER_LOWEST=""
       - php: 5.6
-        env: TASKWARRIOR=2.4.1
+        env:
+          - TASKWARRIOR=2.4.0
+          - PREFER_LOWEST=""
       - php: 5.6
-        env: TASKWARRIOR=2.4.2
+        env:
+          - TASKWARRIOR=2.4.0
+          - PREFER_LOWEST=""
       - php: 5.6
-        env: TASKWARRIOR=2.4.3
+        env:
+          - TASKWARRIOR=2.4.0
+          - PREFER_LOWEST=""
 
 before_install:
   - wget http://taskwarrior.org/download/task-$TASKWARRIOR.tar.gz
