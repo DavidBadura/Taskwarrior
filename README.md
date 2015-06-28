@@ -21,7 +21,7 @@ Unfortunately, the annotation reader is not automatically registered on composer
 ## Requirements
 
 Taskwarrior changes its behavior by patch level updates and it is very difficult to support all versions.
-That's why I've decided just to support only one version: **2.4.4**
+The current supported versions are: **>=2.4.3**
 
 ## Usage
 
