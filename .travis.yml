@@ -13,23 +13,25 @@ env:
     matrix:
       - PREFER_LOWEST="--prefer-lowest"
       - PREFER_LOWEST=""
-    include:
+
+matrix:
+  include:
       - php: 5.6
-        env:
-          - TASKWARRIOR=2.4.0
-          - PREFER_LOWEST=""
+        env: TASKWARRIOR=2.4.0
       - php: 5.6
-        env:
-          - TASKWARRIOR=2.4.0
-          - PREFER_LOWEST=""
+        env: TASKWARRIOR=2.4.1
       - php: 5.6
-        env:
-          - TASKWARRIOR=2.4.0
-          - PREFER_LOWEST=""
+        env: TASKWARRIOR=2.4.2
       - php: 5.6
-        env:
-          - TASKWARRIOR=2.4.0
-          - PREFER_LOWEST=""
+        env: TASKWARRIOR=2.4.3
+  allow_failures:
+    - php: 7
+    - php: nightly
+    - php: hhvm
+    - env: TASKWARRIOR=2.4.0
+    - env: TASKWARRIOR=2.4.1
+    - env: TASKWARRIOR=2.4.2
+    - env: TASKWARRIOR=2.4.3
 
 before_install:
   - wget http://taskwarrior.org/download/task-$TASKWARRIOR.tar.gz
@@ -48,8 +50,3 @@ before_install:
 before_script:
     - composer update --prefer-source $PREFER_LOWEST
 
-matrix:
-  allow_failures:
-    - php: 7
-    - php: nightly
-    - php: hhvm
