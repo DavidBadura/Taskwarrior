@@ -34,6 +34,11 @@ class TaskManager
     private $tasks = [];
 
     /**
+     * @var Serializer
+     */
+    private $serializer;
+
+    /**
      * @param Taskwarrior $taskwarrior
      */
     public function __construct(Taskwarrior $taskwarrior)
@@ -400,12 +405,16 @@ class TaskManager
      */
     private function getSerializer()
     {
+        if ($this->serializer) {
+            return $this->serializer;
+        }
+
         $propertyNamingStrategy = new SerializedNameAnnotationStrategy(new CamelCaseNamingStrategy());
 
         $visitor = new JsonSerializationVisitor($propertyNamingStrategy);
         $visitor->setOptions(JSON_UNESCAPED_UNICODE);
 
-        return SerializerBuilder::create()
+        return $this->serializer = SerializerBuilder::create()
             ->setPropertyNamingStrategy($propertyNamingStrategy)
             ->configureHandlers(function (HandlerRegistryInterface $registry) {
                 $registry->registerSubscribingHandler(new CarbonHandler());

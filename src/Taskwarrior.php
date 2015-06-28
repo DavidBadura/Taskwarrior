@@ -38,6 +38,7 @@ class Taskwarrior
      * @param string $taskData
      * @param array $rcOptions
      * @param string $bin
+     * @throws TaskwarriorException
      */
     public function __construct($taskrc = '~/.taskrc', $taskData = '~/.task', $rcOptions = [], $bin = 'task')
     {
@@ -51,6 +52,10 @@ class Taskwarrior
             ),
             $rcOptions
         );
+
+        if (version_compare($this->version(), '2.4.3') < 0) {
+            throw new TaskwarriorException(sprintf("Taskwarrior version %s isn't supported", $this->version()));
+        }
     }
 
     /**
