@@ -5,19 +5,20 @@ php:
   - 5.5
   - 5.6
   - 7
-  - nightly
   - hhvm
 
 env:
+    global:
+      - TASKWARRIOR=2.4.4
     matrix:
       - PREFER_LOWEST="--prefer-lowest"
       - PREFER_LOWEST=""
 
 before_install:
-  - wget http://taskwarrior.org/download/task-2.4.4.tar.gz
-  - gunzip task-2.4.4.tar.gz
-  - tar xf task-2.4.4.tar
-  - cd task-2.4.4
+  - wget http://taskwarrior.org/download/task-$TASKWARRIOR.tar.gz
+  - gunzip task-$TASKWARRIOR.tar.gz
+  - tar xf task-$TASKWARRIOR.tar
+  - cd task-$TASKWARRIOR
   - sudo apt-get install cmake build-essential uuid-dev libgnutls-dev libreadline6-dev --force-yes
   - sudo cmake -DCMAKE_BUILD_TYPE=release .
   - sudo make
@@ -25,9 +26,9 @@ before_install:
   - sudo ln -s /usr/local/bin/task /usr/bin/task
   - task --version
   - cd ..
+  - composer self-update
 
 before_script:
-    - composer self-update
     - composer update --prefer-source $PREFER_LOWEST
 
 matrix:
