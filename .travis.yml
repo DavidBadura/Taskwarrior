@@ -13,6 +13,11 @@ env:
     matrix:
       - PREFER_LOWEST="--prefer-lowest"
       - PREFER_LOWEST=""
+    include:
+      - env: TASKWARRIOR=2.4.0
+      - env: TASKWARRIOR=2.4.1
+      - env: TASKWARRIOR=2.4.2
+      - env: TASKWARRIOR=2.4.3
 
 before_install:
   - wget http://taskwarrior.org/download/task-$TASKWARRIOR.tar.gz
