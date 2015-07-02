@@ -1,33 +1,34 @@
 {
-  "name": "davidbadura/taskwarrior",
-  "description": "a php lib for taskwarrior",
-  "keywords": [
-    "task",
-    "taskwarrior"
-  ],
-  "type": "library",
-  "license": "MIT",
-  "authors": [
-    {
-      "name": "David Badura",
-      "email": "d.badura@gmx.de"
+    "name": "davidbadura/taskwarrior",
+    "description": "a php lib for taskwarrior",
+    "keywords": [
+        "task",
+        "taskwarrior"
+    ],
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "David Badura",
+            "email": "d.badura@gmx.de"
+        }
+    ],
+    "require": {
+        "php": ">=5.4",
+        "symfony/process": "~2.3",
+        "jms/serializer": "0.16.*",
+        "symfony/filesystem": "~2.3",
+        "nesbot/carbon": "~1.14",
+        "doctrine/collections": "~1.3",
+        "webmozart/path-util": "^2.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~4.0",
+        "symfony/var-dumper": "~2.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "DavidBadura\\Taskwarrior\\": "src"
+        }
     }
-  ],
-  "require": {
-    "php": ">=5.4",
-    "symfony/process": "~2.3",
-    "jms/serializer": "0.16.*",
-    "symfony/filesystem": "~2.3",
-    "nesbot/carbon": "~1.14",
-    "doctrine/collections": "~1.3"
-  },
-  "require-dev": {
-    "phpunit/phpunit": "~4.0",
-    "symfony/var-dumper": "~2.6"
-  },
-  "autoload": {
-    "psr-4": {
-      "DavidBadura\\Taskwarrior\\": "src"
-    }
-  }
 }

@@ -7,6 +7,7 @@ use DavidBadura\Taskwarrior\Exception\CommandException;
 use DavidBadura\Taskwarrior\Exception\TaskwarriorException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
+use Webmozart\PathUtil\Path;
 
 /**
  * @author David Badura <d.a.badura@gmail.com>
@@ -42,11 +43,11 @@ class Taskwarrior
      */
     public function __construct($taskrc = '~/.taskrc', $taskData = '~/.task', $rcOptions = [], $bin = 'task')
     {
-        $this->bin       = $bin;
+        $this->bin       = Path::canonicalize($bin);
         $this->rcOptions = array_merge(
             array(
-                'rc:' . $taskrc,
-                'rc.data.location=' . $taskData,
+                'rc:' . Path::canonicalize($taskrc),
+                'rc.data.location=' . Path::canonicalize($taskData),
                 'rc.json.array=true',
                 'rc.confirmation=no',
             ),
@@ -184,7 +185,7 @@ class Taskwarrior
         $filter = array_filter((array)$filter, 'trim');
 
         if ($filter) {
-            foreach($filter as $f) {
+            foreach ($filter as $f) {
                 $parts[] = "( " . $f . " )";
             }
         }
@@ -296,7 +297,7 @@ class Taskwarrior
      */
     private function createCommandLine(array $parts)
     {
-        $parts = array_map(function($part) {
+        $parts = array_map(function ($part) {
             return "'" . str_replace("'", "'\\''", $part) . "'";
         }, $parts);
 
