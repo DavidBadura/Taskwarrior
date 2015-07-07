@@ -7,6 +7,7 @@ use DavidBadura\Taskwarrior\Exception\CommandException;
 use DavidBadura\Taskwarrior\Exception\TaskwarriorException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
+use Webmozart\Assert\Assert;
 use Webmozart\PathUtil\Path;
 
 /**
@@ -15,14 +16,24 @@ use Webmozart\PathUtil\Path;
 class Taskwarrior
 {
     /**
-     * @var array
+     * @var string
      */
-    private $rcOptions;
+    private $bin;
 
     /**
      * @var string
      */
-    private $bin;
+    private $taskrc;
+
+    /**
+     * @var string
+     */
+    private $taskData;
+
+    /**
+     * @var array
+     */
+    private $rcOptions;
 
     /**
      * @var string
@@ -43,11 +54,14 @@ class Taskwarrior
      */
     public function __construct($taskrc = '~/.taskrc', $taskData = '~/.task', $rcOptions = [], $bin = 'task')
     {
-        $this->bin       = Path::canonicalize($bin);
+        $this->bin      = Path::canonicalize($bin);
+        $this->taskrc   = Path::canonicalize($taskrc);
+        $this->taskData = Path::canonicalize($taskData);
+
         $this->rcOptions = array_merge(
             array(
-                'rc:' . Path::canonicalize($taskrc),
-                'rc.data.location=' . Path::canonicalize($taskData),
+                'rc:' . $this->taskrc,
+                'rc.data.location=' . $this->taskData,
                 'rc.json.array=true',
                 'rc.confirmation=no',
             ),
@@ -56,6 +70,14 @@ class Taskwarrior
 
         if (version_compare($this->version(), '2.4.3') < 0) {
             throw new TaskwarriorException(sprintf("Taskwarrior version %s isn't supported", $this->version()));
+        }
+
+        try {
+            Assert::readable($this->taskrc);
+            Assert::readable($this->taskData);
+            Assert::writable($this->taskData);
+        } catch (\InvalidArgumentException $e) {
+            throw new TaskwarriorException($e->getMessage(), $e->getCode(), $e);
         }
     }
 
@@ -216,6 +238,22 @@ class Taskwarrior
         }
 
         return $this->version;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTaskrcPath()
+    {
+        return $this->taskrc;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTaskDataPath()
+    {
+        return $this->taskData;
     }
 
     /**

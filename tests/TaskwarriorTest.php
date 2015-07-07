@@ -37,4 +37,18 @@ class TaskwarriorTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($config->has('urgency.age.max'));
         $this->assertEquals('365', $config->get('urgency.age.max'));
     }
+
+    public function testTaskrcNotFound()
+    {
+        $this->setExpectedException('DavidBadura\Taskwarrior\Exception\TaskwarriorException');
+
+        new Taskwarrior('/not/found/.taskrc', __DIR__ . '/.task');
+    }
+
+    public function testTaskDataNotFound()
+    {
+        $this->setExpectedException('DavidBadura\Taskwarrior\Exception\TaskwarriorException');
+
+        new Taskwarrior(__DIR__ . '/.taskrc', '/not/found/.task');
+    }
 }
