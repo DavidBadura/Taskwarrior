@@ -4,6 +4,7 @@ namespace DavidBadura\Taskwarrior;
 
 use Carbon\Carbon;
 use DavidBadura\Taskwarrior\Exception\DatetimeParseException;
+use Doctrine\Common\Collections\ArrayCollection;
 use JMS\Serializer\Annotation as JMS;
 
 /**
@@ -127,6 +128,13 @@ class Task
     private $status;
 
     /**
+     * @var Task[]|ArrayCollection
+     *
+     * @JMS\Type("Depends")
+     */
+    private $depends;
+
+    /**
      *
      */
     public function __construct()
@@ -134,6 +142,7 @@ class Task
         $this->urgency = 0;
         $this->entry   = new Carbon('now');
         $this->status  = self::STATUS_PENDING;
+        $this->depends = new ArrayCollection();
     }
 
     /**
@@ -266,6 +275,30 @@ class Task
         if (false !== $key = array_search($tag, $this->tags)) {
             unset($this->tags[$key]);
         }
+    }
+
+    /**
+     * @return Task[]|ArrayCollection
+     */
+    public function getDependencies()
+    {
+        return $this->depends;
+    }
+
+    /**
+     * @param Task $task
+     */
+    public function addDependency(Task $task)
+    {
+        $this->depends->add($task);
+    }
+
+    /**
+     * @param Task $task
+     */
+    public function removeDependency(Task $task)
+    {
+        $this->depends->removeElement($task);
     }
 
     /**

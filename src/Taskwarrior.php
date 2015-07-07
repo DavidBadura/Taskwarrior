@@ -309,6 +309,14 @@ class Taskwarrior
             }
         }
 
+        if (array_key_exists('depends', $params)) {
+            if (is_array($params['depends'])) {
+                $options[] = 'depends:' . implode(',', $params['depends']);
+            } else {
+                $options[] = 'depends:' . $params['depends'];
+            }
+        }
+
         if (array_key_exists('status', $params)) {
             $options[] = 'status:' . $params['status'];
         }
