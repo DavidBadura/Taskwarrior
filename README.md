@@ -157,6 +157,28 @@ reopen task:
 $tm->reopen($task);
 ```
 
+dependencies:
+
+```php
+$task1 = new Task();
+$task1->setDescription('a');
+
+$task2 = new Task();
+$task2->setDescription('b');
+
+$task1->addDependency($task2);
+
+// the order is important!
+$tm->save($task2);
+$tm->save($task1);
+
+$tm->clear(); // clear object cache
+
+$task1 = $tm->find('uuid-from-task1');
+$task2 = $task1->getDependencies()[0];
+echo $task2->getDesciption(); // "b" <- lazy loading
+```
+
 ### QueryBuilder
 
 example:

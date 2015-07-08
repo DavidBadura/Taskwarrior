@@ -4,10 +4,13 @@ namespace DavidBadura\Taskwarrior;
 
 use DavidBadura\Taskwarrior\Config\Context;
 use DavidBadura\Taskwarrior\Config\Report;
+use DavidBadura\Taskwarrior\Exception\ReferenceException;
 use DavidBadura\Taskwarrior\Exception\TaskwarriorException;
 use DavidBadura\Taskwarrior\Query\QueryBuilder;
 use DavidBadura\Taskwarrior\Serializer\Handler\CarbonHandler;
+use DavidBadura\Taskwarrior\Serializer\Handler\DependsHandler;
 use DavidBadura\Taskwarrior\Serializer\Handler\RecurringHandler;
+use DavidBadura\Taskwarrior\Serializer\Handler\TaskHandler;
 use Doctrine\Common\Collections\ArrayCollection;
 use JMS\Serializer\Handler\HandlerRegistryInterface;
 use JMS\Serializer\JsonSerializationVisitor;
@@ -15,6 +18,9 @@ use JMS\Serializer\Naming\CamelCaseNamingStrategy;
 use JMS\Serializer\Naming\SerializedNameAnnotationStrategy;
 use JMS\Serializer\Serializer;
 use JMS\Serializer\SerializerBuilder;
+use ProxyManager\Factory\LazyLoadingGhostFactory;
+use ProxyManager\Factory\LazyLoadingValueHolderFactory;
+use ProxyManager\Proxy\LazyLoadingInterface;
 
 /**
  * @author David Badura <d.a.badura@gmail.com>
@@ -286,6 +292,38 @@ class TaskManager
     }
 
     /**
+     * @param string $uuid
+     * @return Task
+     */
+    public function getReference($uuid)
+    {
+        if (isset($this->tasks[$uuid])) {
+            return $this->tasks[$uuid];
+        }
+
+        $self    = $this;
+        $factory = new LazyLoadingValueHolderFactory();
+
+        $initializer = function (
+            & $wrappedObject,
+            LazyLoadingInterface $proxy,
+            $method,
+            array $parameters,
+            & $initializer
+        ) use ($self, $uuid) {
+
+            $initializer   = null;
+            $wrappedObject = $this->export($uuid)[0];
+
+            return true;
+        };
+
+        $task = $factory->createProxy('DavidBadura\Taskwarrior\Task', $initializer);
+
+        return $this->tasks[$uuid] = $task;
+    }
+
+    /**
      * @param Task $task
      */
     private function refresh(Task $task)
@@ -302,7 +340,17 @@ class TaskManager
     {
         $json = $this->taskwarrior->export($filter);
 
-        return $this->getSerializer()->deserialize($json, 'array<DavidBadura\Taskwarrior\Task>', 'json');
+        $tasks = $this->getSerializer()->deserialize($json, 'array<DavidBadura\Taskwarrior\Task>', 'json');
+
+        foreach ($tasks as $task) {
+            if ($task->getDependencies()) {
+                continue;
+            }
+
+            $task->setDependencies(array());
+        }
+
+        return $tasks;
     }
 
     /**
@@ -336,6 +384,16 @@ class TaskManager
 
         if ($task->getRecurring()) {
             $params['recur'] = $task->getRecurring()->getValue();
+        }
+
+        $params['depends'] = [];
+
+        foreach ($task->getDependencies() as $depend) {
+            if (!$depend->getUuid()) {
+                throw new ReferenceException("you can't save a task that has dependencies to tasks that have not been saved");
+            }
+
+            $params['depends'][] = $depend->getUuid();
         }
 
         $this->taskwarrior->modify($params, $task->getUuid());
@@ -419,6 +477,7 @@ class TaskManager
             ->configureHandlers(function (HandlerRegistryInterface $registry) {
                 $registry->registerSubscribingHandler(new CarbonHandler());
                 $registry->registerSubscribingHandler(new RecurringHandler());
+                $registry->registerSubscribingHandler(new DependsHandler($this));
             })
             ->addDefaultHandlers()
             ->setSerializationVisitor('json', $visitor)

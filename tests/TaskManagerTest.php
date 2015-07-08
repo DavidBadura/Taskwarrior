@@ -787,6 +787,59 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(1, $this->taskManager->filterPending('(status:pending or status:waiting)'));
     }
 
+    public function testDependenciesException()
+    {
+        $this->setExpectedException('DavidBadura\Taskwarrior\Exception\ReferenceException');
+
+        $task1 = new Task();
+        $task1->setDescription("a");
+
+        $task2 = new Task();
+        $task2->setDescription("b");
+
+        $task3 = new Task();
+        $task3->setDescription("c");
+
+        $task1->addDependency($task2);
+        $task1->addDependency($task3);
+
+        $this->taskManager->save($task1);
+    }
+
+
+    public function testDependencies()
+    {
+        $task1 = new Task();
+        $task1->setDescription("a");
+
+        $task2 = new Task();
+        $task2->setDescription("b");
+
+        $task1->addDependency($task2);
+
+        $this->taskManager->save($task2);
+        $this->taskManager->save($task1);
+
+        $this->taskManager->clear();
+        $temp1 = $this->taskManager->find($task1->getUuid());
+
+        $this->assertCount(1, $temp1->getDependencies());
+
+        $temp2 = $temp1->getDependencies()[0];
+
+        $this->assertInstanceOf('DavidBadura\Taskwarrior\Task', $temp2);
+        $this->assertEquals('b', $temp2->getDescription());
+
+        $temp1->removeDependency($temp2);
+
+        $this->taskManager->save($temp1);
+
+        $this->taskManager->clear();
+        $temp1 = $this->taskManager->find($task1->getUuid());
+
+        $this->assertCount(0, $temp1->getDependencies());
+    }
+
     /**
      * @param string $string
      * @return \DateTime
