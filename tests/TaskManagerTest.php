@@ -138,8 +138,10 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testDontFind()
     {
+        $this->setExpectedException('DavidBadura\Taskwarrior\Exception\TaskwarriorException',
+            "task not found");
+
         $task = $this->taskManager->find('56464asd46s4adas54da6');
-        $this->assertNull($task);
     }
 
     public function testDoubleSave()
@@ -806,7 +808,6 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $this->taskManager->save($task1);
     }
 
-
     public function testDependencies()
     {
         $task1 = new Task();
@@ -828,6 +829,7 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $temp2 = $temp1->getDependencies()[0];
 
         $this->assertInstanceOf('DavidBadura\Taskwarrior\Task', $temp2);
+        $this->assertEquals($task2->getUuid(), $temp2->getUuid());
         $this->assertEquals('b', $temp2->getDescription());
 
         $temp1->removeDependency($temp2);
@@ -838,6 +840,66 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $temp1 = $this->taskManager->find($task1->getUuid());
 
         $this->assertCount(0, $temp1->getDependencies());
+    }
+
+    public function testLazyReferencesUuid()
+    {
+        $task = $this->taskManager->getReference('foo');
+
+        $this->assertEquals('foo', $task->getUuid());
+    }
+
+    public function testLazyReferencesNotFound()
+    {
+        $this->setExpectedException('DavidBadura\Taskwarrior\Exception\TaskwarriorException');
+
+        $task = $this->taskManager->getReference('foo');
+
+        $task->getDescription();
+    }
+
+    public function testLazyReferencesLoad()
+    {
+        $task = new Task();
+        $task->setDescription('foo');
+
+        $this->taskManager->save($task);
+
+        $this->taskManager->clear();
+
+        $task2 = $this->taskManager->getReference($task->getUuid());
+
+        $this->assertNotSame($task, $task2);
+        $this->assertEquals('foo', $task2->getDescription());
+    }
+
+    public function testSameReferences()
+    {
+        $task = new Task();
+        $task->setDescription('foo');
+
+        $this->taskManager->save($task);
+
+        $task2 = $this->taskManager->getReference($task->getUuid());
+
+        $this->assertSame($task, $task2);
+        $this->assertEquals('foo', $task2->getDescription());
+    }
+
+    public function testFilterReferences()
+    {
+        $task = new Task();
+        $task->setDescription('foo');
+
+        $this->taskManager->save($task);
+
+        $this->taskManager->clear();
+
+        $task = $this->taskManager->getReference($task->getUuid());
+
+        $this->taskManager->filter();
+
+        $this->assertEquals('foo', $task->getDescription());
     }
 
     /**

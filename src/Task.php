@@ -304,7 +304,7 @@ class Task
     /**
      * @param Task[] $tasks
      */
-    public function setDependencies(array $tasks)
+    public function setDependencies(array $tasks = [])
     {
         $this->depends = new ArrayCollection();
 

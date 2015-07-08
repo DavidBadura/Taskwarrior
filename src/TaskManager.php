@@ -6,11 +6,11 @@ use DavidBadura\Taskwarrior\Config\Context;
 use DavidBadura\Taskwarrior\Config\Report;
 use DavidBadura\Taskwarrior\Exception\ReferenceException;
 use DavidBadura\Taskwarrior\Exception\TaskwarriorException;
+use DavidBadura\Taskwarrior\Proxy\UuidContainer;
 use DavidBadura\Taskwarrior\Query\QueryBuilder;
 use DavidBadura\Taskwarrior\Serializer\Handler\CarbonHandler;
 use DavidBadura\Taskwarrior\Serializer\Handler\DependsHandler;
 use DavidBadura\Taskwarrior\Serializer\Handler\RecurringHandler;
-use DavidBadura\Taskwarrior\Serializer\Handler\TaskHandler;
 use Doctrine\Common\Collections\ArrayCollection;
 use JMS\Serializer\Handler\HandlerRegistryInterface;
 use JMS\Serializer\JsonSerializationVisitor;
@@ -18,9 +18,9 @@ use JMS\Serializer\Naming\CamelCaseNamingStrategy;
 use JMS\Serializer\Naming\SerializedNameAnnotationStrategy;
 use JMS\Serializer\Serializer;
 use JMS\Serializer\SerializerBuilder;
-use ProxyManager\Factory\LazyLoadingGhostFactory;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 use ProxyManager\Proxy\LazyLoadingInterface;
+use ProxyManager\Proxy\ValueHolderInterface;
 
 /**
  * @author David Badura <d.a.badura@gmail.com>
@@ -92,17 +92,9 @@ class TaskManager
             return $this->tasks[$uuid];
         }
 
-        $tasks = $this->filter($uuid);
+        $task = $this->exportOne($uuid);
 
-        if (count($tasks) == 0) {
-            return null;
-        }
-
-        if (count($tasks) == 1) {
-            return $tasks[0];
-        }
-
-        throw new TaskwarriorException();
+        return $this->tasks[$uuid] = $task;
     }
 
     /**
@@ -114,15 +106,34 @@ class TaskManager
         $result = $this->export($filter);
 
         foreach ($result as $key => $task) {
-            if (isset($this->tasks[$task->getUuid()])) {
 
-                $result[$key] = $this->tasks[$task->getUuid()];
-                $this->merge($result[$key], $task);
+            // not yet known? then remember it
+            if (!isset($this->tasks[$task->getUuid()])) {
+                $this->tasks[$task->getUuid()] = $task;
 
                 continue;
             }
 
-            $this->tasks[$task->getUuid()] = $task;
+            // replace result entry
+            $result[$key] = $prev = $this->tasks[$task->getUuid()];
+
+            // not proxy? update task
+            if (!$prev instanceof LazyLoadingInterface || !$prev instanceof ValueHolderInterface) {
+                $this->merge($prev, $task);
+
+                continue;
+            }
+
+            // wrapper object is a task? skip
+            if ($prev->getWrappedValueHolderValue() instanceof Task) {
+                continue;
+            }
+
+            // replace proxy initializer
+            $prev->setProxyInitializer(function (&$wrappedObject, LazyLoadingInterface $proxy) use ($task) {
+                $proxy->setProxyInitializer(null);
+                $wrappedObject = $task;
+            });
         }
 
         return new ArrayCollection($result);
@@ -301,21 +312,21 @@ class TaskManager
             return $this->tasks[$uuid];
         }
 
-        $self    = $this;
         $factory = new LazyLoadingValueHolderFactory();
 
         $initializer = function (
-            & $wrappedObject,
+            &$wrappedObject,
             LazyLoadingInterface $proxy,
-            $method,
-            array $parameters,
-            & $initializer
-        ) use ($self, $uuid) {
-
-            $initializer   = null;
-            $wrappedObject = $this->export($uuid)[0];
-
-            return true;
+            $method
+        ) use ($uuid) {
+            if ('getUuid' == $method) {
+                if (!$wrappedObject) {
+                    $wrappedObject = new UuidContainer($uuid);
+                }
+            } else {
+                $proxy->setProxyInitializer(null);
+                $wrappedObject = $this->exportOne($uuid);
+            }
         };
 
         $task = $factory->createProxy('DavidBadura\Taskwarrior\Task', $initializer);
@@ -328,7 +339,12 @@ class TaskManager
      */
     private function refresh(Task $task)
     {
-        $clean = $this->export($task->getUuid())[0];
+        // skip refresh & initailize task
+        if ($task instanceof LazyLoadingInterface && !$task->isProxyInitialized()) {
+            return;
+        }
+
+        $clean = $this->exportOne($task->getUuid());
         $this->merge($task, $clean);
     }
 
@@ -340,17 +356,36 @@ class TaskManager
     {
         $json = $this->taskwarrior->export($filter);
 
+        /** @var Task[] $tasks */
         $tasks = $this->getSerializer()->deserialize($json, 'array<DavidBadura\Taskwarrior\Task>', 'json');
 
         foreach ($tasks as $task) {
-            if ($task->getDependencies()) {
-                continue;
+            if (!$task->getDependencies()) {
+                $task->setDependencies([]);
             }
-
-            $task->setDependencies(array());
         }
 
         return $tasks;
+    }
+
+    /**
+     * @param string|array $filter
+     * @return Task
+     * @throws TaskwarriorException
+     */
+    private function exportOne($filter)
+    {
+        $tasks = $this->export($filter);
+
+        if (count($tasks) == 0) {
+            throw new TaskwarriorException('task not found');
+        }
+
+        if (count($tasks) > 1) {
+            throw new TaskwarriorException('multiple task found');
+        }
+
+        return $tasks[0];
     }
 
     /**
