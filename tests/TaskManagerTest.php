@@ -837,8 +837,6 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $this->taskManager->clear();
         $temp1 = $this->taskManager->find($task1->getUuid());
 
-        dump($temp1);
-
         $this->assertCount(0, $temp1->getDependencies());
     }
 

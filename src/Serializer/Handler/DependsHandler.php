@@ -40,14 +40,14 @@ class DependsHandler implements SubscribingHandlerInterface
             'type'      => 'Depends',
             'format'    => 'json',
             'direction' => GraphNavigator::DIRECTION_DESERIALIZATION,
-            'method'    => 'deserializeCarbon'
+            'method'    => 'deserialize'
         );
 
         $methods[] = array(
             'type'      => 'Depends',
             'format'    => 'json',
             'direction' => GraphNavigator::DIRECTION_SERIALIZATION,
-            'method'    => 'serializeCarbon'
+            'method'    => 'serialize'
         );
 
         return $methods;
@@ -61,7 +61,7 @@ class DependsHandler implements SubscribingHandlerInterface
      * @return string
      * @throws ReferenceException
      */
-    public function serializeCarbon(VisitorInterface $visitor, $tasks, array $type, Context $context)
+    public function serialize(VisitorInterface $visitor, $tasks, array $type, Context $context)
     {
         $list = [];
 
@@ -82,10 +82,8 @@ class DependsHandler implements SubscribingHandlerInterface
      * @param array $type
      * @return ArrayCollection
      */
-    public function deserializeCarbon(VisitorInterface $visitor, $data, array $type)
+    public function deserialize(VisitorInterface $visitor, $data, array $type)
     {
-        dump($data);
-
         if (!$data) {
             return new ArrayCollection();
         }

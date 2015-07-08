@@ -302,6 +302,18 @@ class Task
     }
 
     /**
+     * @param Task[] $tasks
+     */
+    public function setDependencies(array $tasks)
+    {
+        $this->depends = new ArrayCollection();
+
+        foreach ($tasks as $task) {
+            $this->addDependency($task);
+        }
+    }
+
+    /**
      * @return Recurring
      */
     public function getRecurring()

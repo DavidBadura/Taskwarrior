@@ -340,7 +340,17 @@ class TaskManager
     {
         $json = $this->taskwarrior->export($filter);
 
-        return $this->getSerializer()->deserialize($json, 'array<DavidBadura\Taskwarrior\Task>', 'json');
+        $tasks = $this->getSerializer()->deserialize($json, 'array<DavidBadura\Taskwarrior\Task>', 'json');
+
+        foreach ($tasks as $task) {
+            if ($task->getDependencies()) {
+                continue;
+            }
+
+            $task->setDependencies(array());
+        }
+
+        return $tasks;
     }
 
     /**
