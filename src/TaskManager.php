@@ -274,14 +274,17 @@ class TaskManager
      * @return Task[]|ArrayCollection
      * @throws Exception\ConfigException
      */
-    public function filterByReport($report)
+    public function filterByReport($report, $additionalFilters = null)
     {
         if (!$report instanceof Report) {
             $report = $this->taskwarrior->config()->getReport($report);
         }
 
+        // @todo eliminate duplicate filters
+        $filter = trim($report->filter . ' ' . $additionalFilters);
+
         return $this->createQueryBuilder()
-            ->where($report->filter)
+            ->where($filter)
             ->orderBy($report->sort)
             ->getResult();
     }
