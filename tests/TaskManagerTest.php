@@ -9,7 +9,8 @@ use DavidBadura\Taskwarrior\Taskwarrior;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * @author David Badura <badura@simplethings.de>
+ * @author David Badura <d.a.badura@gmail.com>
+ * @author Tobias Olry <tobias.olry@gmail.com>
  */
 class TaskManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -548,7 +549,7 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('später'), $task1->getTags());
         $this->assertEquals(array('später'), $this->taskwarrior->tags());
 
-        $this->assertCount(1,$this->taskManager->filterPending('+später'));
+        $this->assertCount(1, $this->taskManager->filterPending('+später'));
     }
 
     public function testTagNameNotAllowed()
@@ -561,6 +562,33 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $task1->addTag('foo-bar');
 
         $this->taskManager->save($task1);
+    }
+
+    public function provideProjectNames()
+    {
+        return [
+            ['grandparent.parent.child'],
+            ['parent.child'],
+        ];
+    }
+
+    /**
+     * @dataProvider provideProjectNames
+     */
+    public function testProjectHierarchyAllowed($project)
+    {
+        $task = new Task();
+        $task->setDescription('foo1');
+        $task->setProject($project);
+
+        // no exception thrown
+        $this->taskManager->save($task);
+
+        // refetch the task
+        $this->taskManager->clear();
+        $task = $this->taskManager->find($task->getUuid());
+
+        $this->assertEquals($project, $task->getProject());
     }
 
     public function testWait()

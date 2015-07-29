@@ -24,10 +24,11 @@ use ProxyManager\Proxy\ValueHolderInterface;
 
 /**
  * @author David Badura <d.a.badura@gmail.com>
+ * @author Tobias Olry <tobias.olry@gmail.com>
  */
 class TaskManager
 {
-    const PATTERN = '/^[\wäüö]*$/i';
+    const PATTERN = '/^[\wäüö\.]*$/i';
 
     /**
      * @var Taskwarrior
