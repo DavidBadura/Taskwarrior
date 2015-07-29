@@ -564,19 +564,31 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $this->taskManager->save($task1);
     }
 
-    public function testProjectHierarchyAllowed()
+    public function provideProjectNames()
     {
-        $projects = ['grandparent.parent.child', 'parent.child'];
-        foreach ($projects as $project) {
-            $task = new Task();
-            $task->setDescription('foo1');
-            $task->setProject($project);
+        return [
+            ['grandparent.parent.child'],
+            ['parent.child'],
+        ];
+    }
 
-            // now exception thrown
-            $this->taskManager->save($task);
+    /**
+     * @dataProvider provideProjectNames
+     */
+    public function testProjectHierarchyAllowed($project)
+    {
+        $task = new Task();
+        $task->setDescription('foo1');
+        $task->setProject($project);
 
-            $this->assertEquals($project, $task->getProject());
-        }
+        // no exception thrown
+        $this->taskManager->save($task);
+
+        // refetch the task
+        $this->taskManager->clear();
+        $task = $this->taskManager->find($task->getUuid());
+
+        $this->assertEquals($project, $task->getProject());
     }
 
     public function testWait()
