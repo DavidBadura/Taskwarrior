@@ -27,7 +27,8 @@ before_install:
 
 install:
   - ln -s build/taskwarrior-$TASKWARRIOR task
-  - task --version
+  - chmod +x ./task
+  - ./task --version
 
 before_script:
     - composer update $PREFER_LOWEST
