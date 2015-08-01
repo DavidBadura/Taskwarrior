@@ -18,7 +18,14 @@ class TaskwarriorTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->tearDown();
-        $this->taskwarrior = new Taskwarrior(__DIR__ . '/.taskrc', __DIR__ . '/.task');
+
+        $bin = 'task';
+
+        if (file_exists(__DIR__ . '/../task')) {
+            $bin = realpath(__DIR__ . '/../task');
+        }
+
+        $this->taskwarrior = new Taskwarrior(__DIR__ . '/.taskrc', __DIR__ . '/.task', [], $bin);
         $this->taskwarrior->version(); // to initialise
     }
 

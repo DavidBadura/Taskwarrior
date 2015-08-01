@@ -1,5 +1,11 @@
 language: php
 
+sudo: false
+
+cache:
+  directories:
+    - $HOME/.composer/cache
+
 php:
   - 5.4
   - 5.5
@@ -26,18 +32,10 @@ before_install:
   - composer self-update
 
 install:
-  - wget http://taskwarrior.org/download/task-$TASKWARRIOR.tar.gz
-  - gunzip task-$TASKWARRIOR.tar.gz
-  - tar xf task-$TASKWARRIOR.tar
-  - cd task-$TASKWARRIOR
-  - sudo apt-get install cmake build-essential uuid-dev libgnutls-dev libreadline6-dev --force-yes
-  - sudo cmake -DCMAKE_BUILD_TYPE=release .
-  - sudo make
-  - sudo make install
-  - sudo ln -s /usr/local/bin/task /usr/bin/task
-  - task --version
-  - cd ..
+  - ln -s build/taskwarrior-$TASKWARRIOR task
+  - chmod +x ./task
+  - ./task --version
 
 before_script:
-    - composer update --prefer-source $PREFER_LOWEST
+    - composer update $PREFER_LOWEST
 

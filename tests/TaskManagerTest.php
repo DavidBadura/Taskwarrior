@@ -37,7 +37,13 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $fs->remove($this->taskDir . '/.taskrc');
         $fs->remove($this->taskDir . '/.task');
 
-        $this->taskwarrior = new Taskwarrior($this->taskDir . '/.taskrc', $this->taskDir . '/.task');
+        $bin = 'task';
+
+        if (file_exists(__DIR__ . '/../task')) {
+            $bin = realpath(__DIR__ . '/../task');
+        }
+
+        $this->taskwarrior = new Taskwarrior($this->taskDir . '/.taskrc', $this->taskDir . '/.task', [], $bin);
         $this->taskManager = new TaskManager($this->taskwarrior);
         $this->taskwarrior->version(); // to initialise
     }
