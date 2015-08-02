@@ -435,39 +435,38 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, $task1->getUrgency());
     }
 
-    public function testProject()
+
+    public function provideProjectNames()
     {
-        $task1 = new Task();
-        $task1->setDescription('foo1');
-        $task1->setProject('home');
+        return [
+            ['foo'],
+            ['später'],
+            ['grandparent.parent.child'],
+            ['parent.child'],
+        ];
+    }
 
-        $task2 = new Task();
-        $task2->setDescription('foo2');
-        $task2->setProject('office');
+    /**
+     * @dataProvider provideProjectNames
+     */
+    public function testProject($project)
+    {
+        $task = new Task();
+        $task->setDescription('foo1');
+        $task->setProject($project);
 
-        $this->taskManager->save($task1);
-        $this->taskManager->save($task2);
+        // no exception thrown
+        $this->taskManager->save($task);
 
+        // refetch the task
         $this->taskManager->clear();
+        $task = $this->taskManager->find($task->getUuid());
 
-        $task1 = $this->taskManager->find($task1->getUuid());
-        $task2 = $this->taskManager->find($task2->getUuid());
+        $this->assertEquals($project, $task->getProject());
 
-        $this->assertEquals('home', $task1->getProject());
-        $this->assertEquals('office', $task2->getProject());
-
-        $this->assertCount(2, $this->taskManager->filterPending());
-        $this->assertCount(1, $this->taskManager->filterPending('project:home'));
-        $this->assertCount(1, $this->taskManager->filterPending('project:office'));
-        $this->assertCount(0, $this->taskManager->filterPending('project:hobby'));
-
-        $task2->setProject('home');
-        $this->taskManager->save($task2);
-
-        $this->assertCount(2, $this->taskManager->filterPending());
-        $this->assertCount(2, $this->taskManager->filterPending('project:home'));
-        $this->assertCount(0, $this->taskManager->filterPending('project:office'));
-        $this->assertCount(0, $this->taskManager->filterPending('project:hobby'));
+        $this->assertCount(1, $this->taskManager->filterPending());
+        $this->assertCount(1, $this->taskManager->filterPending('project:' . $project));
+        $this->assertCount(0, $this->taskManager->filterPending('project:emtpy_project'));
     }
 
     public function testProjects()
@@ -568,33 +567,6 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $task1->addTag('foo-bar');
 
         $this->taskManager->save($task1);
-    }
-
-    public function provideProjectNames()
-    {
-        return [
-            ['grandparent.parent.child'],
-            ['parent.child'],
-        ];
-    }
-
-    /**
-     * @dataProvider provideProjectNames
-     */
-    public function testProjectHierarchyAllowed($project)
-    {
-        $task = new Task();
-        $task->setDescription('foo1');
-        $task->setProject($project);
-
-        // no exception thrown
-        $this->taskManager->save($task);
-
-        // refetch the task
-        $this->taskManager->clear();
-        $task = $this->taskManager->find($task->getUuid());
-
-        $this->assertEquals($project, $task->getProject());
     }
 
     public function testWait()
