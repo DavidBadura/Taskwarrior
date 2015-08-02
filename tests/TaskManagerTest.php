@@ -188,15 +188,15 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(2, $this->taskManager->filterPending());
 
         $this->taskManager->done($task);
-        $this->isTrue($task->isCompleted());
+        $this->assertTrue($task->isCompleted());
 
         $task3 = clone $task;
 
-        $this->isTrue($task3->isPending());
+        $this->assertTrue($task3->isPending());
         $this->taskManager->save($task3);
 
-        $this->isTrue($task->isCompleted());
-        $this->isTrue($task3->isPending());
+        $this->assertTrue($task->isCompleted());
+        $this->assertTrue($task3->isPending());
     }
 
 
