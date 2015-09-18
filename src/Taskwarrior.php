@@ -63,6 +63,7 @@ class Taskwarrior
                 'rc:' . $this->taskrc,
                 'rc.data.location=' . $this->taskData,
                 'rc.json.array=true',
+                'rc.json.depends.array=false',
                 'rc.confirmation=no',
             ),
             $rcOptions
@@ -152,7 +153,38 @@ class Taskwarrior
         $tags = $this->parseResult($result);
 
         return array_values(array_filter($tags, function ($value) {
-            return !in_array($value, ['next', 'nocal', 'nocolor', 'nonag']);
+            return !in_array($value, [
+                "ACTIVE",
+                "ANNOTATED",
+                "BLOCKED",
+                "BLOCKING",
+                "CHILD",
+                "COMPLETED",
+                "DELETED",
+                "DUE",
+                "DUETODAY",
+                "MONTH",
+                "ORPHAN",
+                "OVERDUE",
+                "PARENT",
+                "PENDING",
+                "READY",
+                "SCHEDULED",
+                "TAGGED",
+                "TODAY",
+                "TOMORROW",
+                "UDA",
+                "UNBLOCKED",
+                "UNTIL",
+                "WAITING",
+                "WEEK",
+                "YEAR",
+                "YESTERDAY",
+                "next",
+                "nocal",
+                "nocolor",
+                "nonag"
+            ]);
         }));
     }
 
