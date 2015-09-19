@@ -422,6 +422,11 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
     {
         $task1 = new Task();
         $task1->setDescription('foo1');
+
+        $this->taskManager->save($task1);
+
+        $this->assertEquals(0, $task1->getUrgency());
+
         $task1->setDue($this->createDateTime('1989-01-08 11:12:13'));
 
         $this->taskManager->save($task1);

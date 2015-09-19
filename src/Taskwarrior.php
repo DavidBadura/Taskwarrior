@@ -5,7 +5,6 @@ namespace DavidBadura\Taskwarrior;
 use DavidBadura\Taskwarrior\Config\Config;
 use DavidBadura\Taskwarrior\Exception\CommandException;
 use DavidBadura\Taskwarrior\Exception\TaskwarriorException;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
 use Webmozart\Assert\Assert;
 use Webmozart\PathUtil\Path;
@@ -63,13 +62,12 @@ class Taskwarrior
                 'rc:' . $this->taskrc,
                 'rc.data.location=' . $this->taskData,
                 'rc.json.array=true',
-                'rc.json.depends.array=false',
                 'rc.confirmation=no',
             ),
             $rcOptions
         );
 
-        if (version_compare($this->version(), '2.4.3') < 0) {
+        if (version_compare($this->version(), '2.5.0.beta2') < 0) {
             throw new TaskwarriorException(sprintf("Taskwarrior version %s isn't supported", $this->version()));
         }
 
@@ -196,14 +194,7 @@ class Taskwarrior
      */
     public function import($json)
     {
-        $fs = new Filesystem();
-
-        $file = tempnam(sys_get_temp_dir(), 'task') . '.json';
-        $fs->dumpFile($file, $json);
-
-        $output = $this->command('import', null, [$file]);
-
-        $fs->remove($file);
+        $output = $this->command('import', null, ['-'], $json);
 
         if ($uuid = self::parseUuid($output)) {
             return $uuid;
@@ -225,10 +216,11 @@ class Taskwarrior
      * @param string $command
      * @param string|string[] $filter
      * @param array $options
+     * @param string $input
      * @return string
-     * @throws TaskwarriorException
+     * @throws CommandException
      */
-    public function command($command, $filter = null, array $options = array())
+    public function command($command, $filter = null, array $options = array(), $input = null)
     {
         $parts = [$this->bin];
 
@@ -251,6 +243,11 @@ class Taskwarrior
         }
 
         $process = new Process($this->createCommandLine($parts));
+
+        if ($input) {
+            $process->setInput($input);
+        }
+
         $process->run();
 
         if (!$process->isSuccessful()) {

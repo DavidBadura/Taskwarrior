@@ -4,7 +4,6 @@ namespace DavidBadura\Taskwarrior;
 
 use DavidBadura\Taskwarrior\Config\Context;
 use DavidBadura\Taskwarrior\Config\Report;
-use DavidBadura\Taskwarrior\Exception\ReferenceException;
 use DavidBadura\Taskwarrior\Exception\TaskwarriorException;
 use DavidBadura\Taskwarrior\Proxy\UuidContainer;
 use DavidBadura\Taskwarrior\Query\QueryBuilder;
@@ -16,6 +15,7 @@ use JMS\Serializer\Handler\HandlerRegistryInterface;
 use JMS\Serializer\JsonSerializationVisitor;
 use JMS\Serializer\Naming\CamelCaseNamingStrategy;
 use JMS\Serializer\Naming\SerializedNameAnnotationStrategy;
+use JMS\Serializer\SerializationContext;
 use JMS\Serializer\Serializer;
 use JMS\Serializer\SerializerBuilder;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
@@ -73,11 +73,11 @@ class TaskManager
             throw new TaskwarriorException(implode(', ', $errors));
         }
 
-        if (!$task->getUuid()) {
-            $this->add($task);
-        } else {
-            $this->edit($task);
-        }
+        $json = $this->serializeTask($task);
+        $uuid = $this->taskwarrior->import($json);
+
+        $this->setValue($task, 'uuid', $uuid);
+        $this->tasks[$uuid] = $task;
 
         $this->refresh($task);
     }
@@ -390,52 +390,6 @@ class TaskManager
     }
 
     /**
-     * @param Task $task
-     * @throws TaskwarriorException
-     */
-    private function add(Task $task)
-    {
-        $json = $this->serializeTask($task);
-        $uuid = $this->taskwarrior->import($json);
-
-        $this->setValue($task, 'uuid', $uuid);
-        $this->tasks[$uuid] = $task;
-    }
-
-    /**
-     * @param Task $task
-     * @throws TaskwarriorException
-     */
-    private function edit(Task $task)
-    {
-        $params = [
-            'description' => $task->getDescription(),
-            'project'     => $task->getProject(),
-            'priority'    => $task->getPriority(),
-            'tags'        => $task->getTags(),
-            'due'         => $this->transformDate($task->getDue()),
-            'wait'        => $this->transformDate($task->getWait()),
-            'until'       => $this->transformDate($task->getUntil())
-        ];
-
-        if ($task->getRecurring()) {
-            $params['recur'] = $task->getRecurring()->getValue();
-        }
-
-        $params['depends'] = [];
-
-        foreach ($task->getDependencies() as $depend) {
-            if (!$depend->getUuid()) {
-                throw new ReferenceException("you can't save a task that has dependencies to tasks that have not been saved");
-            }
-
-            $params['depends'][] = $depend->getUuid();
-        }
-
-        $this->taskwarrior->modify($params, $task->getUuid());
-    }
-
-    /**
      * @param Task $old
      * @param Task $new
      */
@@ -476,22 +430,6 @@ class TaskManager
         $refProp  = $refClass->getProperty($attr);
         $refProp->setAccessible(true);
         $refProp->setValue($task, $value);
-    }
-
-    /**
-     * @param \DateTime $dateTime
-     * @return null|string
-     */
-    private function transformDate(\DateTime $dateTime = null)
-    {
-        if (!$dateTime) {
-            return null;
-        }
-
-        $dateTime = clone $dateTime;
-        $dateTime->setTimezone(new \DateTimeZone('UTC'));
-
-        return $dateTime->format('Ymd\THis\Z');
     }
 
     /**
