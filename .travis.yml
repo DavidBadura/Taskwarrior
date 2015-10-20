@@ -16,22 +16,15 @@ php:
 
 env:
     global:
-      - TASKWARRIOR=2.4.4
+      - TASKWARRIOR=2.5.0.beta3
     matrix:
       - PREFER_LOWEST="--prefer-lowest"
       - PREFER_LOWEST=""
 
 matrix:
-  include:
-      - php: 5.6
-        env: TASKWARRIOR=2.4.3
-      - php: 5.6
-        env: TASKWARRIOR=2.5.0.beta3
   allow_failures:
       - php: 7
       - php: hhvm
-      - php: 5.6
-        env: TASKWARRIOR=2.5.0.beta3
 
 before_install:
   - composer self-update
