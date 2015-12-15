@@ -16,7 +16,7 @@ php:
 
 env:
     global:
-      - TASKWARRIOR=2.5.0.beta3
+      - TASKWARRIOR=2.5.0
     matrix:
       - PREFER_LOWEST="--prefer-lowest"
       - PREFER_LOWEST=""
