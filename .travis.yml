@@ -4,7 +4,7 @@ addons:
   apt:
     packages:
     - cmake
-    - libuuid1
+    - libuuid
 
 sudo: false
 
