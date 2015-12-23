@@ -4,6 +4,7 @@ addons:
   apt:
     packages:
     - cmake
+    - libgnutls-dev
     - libuuid1
 
 sudo: false
