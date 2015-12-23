@@ -27,7 +27,6 @@ matrix:
       - php: hhvm
 
 install:
-  - make get-deps
   - cd build
   - bash build.sh $TASKWARRIOR
   - cd ..
