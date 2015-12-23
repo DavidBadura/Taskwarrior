@@ -7,8 +7,6 @@ cache:
     - $HOME/.composer/cache
     - vendor
 
-install: make get-deps
-
 php:
   - 5.4
   - 5.5
@@ -28,14 +26,18 @@ matrix:
       - php: 7
       - php: hhvm
 
-before_install:
-  - composer self-update
-
 install:
+  - make get-deps
+  - cd build
+  - bash build.sh $TASKWARRIOR
+  - cd ..
   - ln -s build/taskwarrior-$TASKWARRIOR task
   - chmod +x ./task
   - ./task --version
 
 before_script:
+    - composer self-update
     - composer update $PREFER_LOWEST
 
+script:
+  - vendor/bin/phpunit
