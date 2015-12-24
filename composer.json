@@ -16,7 +16,7 @@
     ],
     "require": {
         "php": ">=5.4",
-        "symfony/process": "^2.3",
+        "symfony/process": "^2.5",
         "jms/serializer": "^1.0",
         "phpoption/phpoption": "^1.3",
         "symfony/filesystem": "^2.3",
