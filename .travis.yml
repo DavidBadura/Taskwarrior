@@ -1,11 +1,21 @@
 language: php
 
+addons:
+  apt:
+    packages:
+    - cmake
+    - libgnutls-dev
+    - libuuid1
+    - uuid
+    - uuid-dev
+
 sudo: false
 
 cache:
   directories:
     - $HOME/.composer/cache
     - vendor
+    - build
 
 php:
   - 5.4
@@ -33,14 +43,15 @@ matrix:
       - php: 5.6
         env: TASKWARRIOR=2.5.0
 
-before_install:
-  - composer self-update
-
 install:
+  - bash build.sh $TASKWARRIOR
   - ln -s build/taskwarrior-$TASKWARRIOR task
   - chmod +x ./task
   - ./task --version
 
 before_script:
+    - composer self-update
     - composer update $PREFER_LOWEST
 
+script:
+  - vendor/bin/phpunit
