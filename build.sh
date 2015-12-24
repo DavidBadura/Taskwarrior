@@ -2,7 +2,15 @@
 
 TASKWARRIOR=$1
 
-wget http://taskwarrior.org/download/task-$TASKWARRIOR.tar.gz
+[ -d build ] || mkdir build
+
+if [ -f build/taskwarrior-$TASKWARRIOR ]
+  then
+    exit;
+fi
+
+cd build
+wget http://taskwarrior.org/download/task-$TASKWARRIOR.tar.gz || exit
 gunzip task-$TASKWARRIOR.tar.gz
 tar xf task-$TASKWARRIOR.tar
 cd task-$TASKWARRIOR
@@ -11,3 +19,4 @@ make
 cd ..
 cp task-$TASKWARRIOR/src/task ./taskwarrior-$TASKWARRIOR
 sudo rm -Rf task-$TASKWARRIOR*
+cd ..

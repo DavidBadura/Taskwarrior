@@ -15,6 +15,7 @@ cache:
   directories:
     - $HOME/.composer/cache
     - vendor
+    - build
 
 php:
   - 5.4
@@ -36,9 +37,7 @@ matrix:
       - php: hhvm
 
 install:
-  - cd build
   - bash build.sh $TASKWARRIOR
-  - cd ..
   - ln -s build/taskwarrior-$TASKWARRIOR task
   - chmod +x ./task
   - ./task --version
