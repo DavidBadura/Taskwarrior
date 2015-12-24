@@ -6,6 +6,8 @@ addons:
     - cmake
     - libgnutls-dev
     - libuuid1
+    - uuid
+    - uuid-dev
 
 sudo: false
 
