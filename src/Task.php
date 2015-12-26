@@ -274,6 +274,7 @@ class Task
 
         if (false !== $key = array_search($tag, $this->tags)) {
             unset($this->tags[$key]);
+            $this->tags = array_values($this->tags);
         }
     }
 

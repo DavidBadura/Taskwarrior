@@ -67,7 +67,7 @@ class Taskwarrior
             $rcOptions
         );
 
-        if (version_compare($this->version(), '2.5.0.beta2') < 0) {
+        if (version_compare($this->version(), '2.5.0') < 0) {
             throw new TaskwarriorException(sprintf("Taskwarrior version %s isn't supported", $this->version()));
         }
 
