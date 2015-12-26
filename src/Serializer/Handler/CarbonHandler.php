@@ -40,7 +40,7 @@ class CarbonHandler implements SubscribingHandlerInterface
     public static function getSubscribingMethods()
     {
         $methods = array();
-        $types   = array('Carbon\Carbon', 'Carbon');
+        $types   = array(Carbon::class, 'Carbon');
 
         foreach ($types as $type) {
             $methods[] = array(

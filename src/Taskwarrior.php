@@ -213,6 +213,16 @@ class Taskwarrior
     }
 
     /**
+     * @param string|string[] $filter
+     * @return int
+     * @throws CommandException
+     */
+    public function count($filter = null)
+    {
+        return (int)$this->command('count', $filter);
+    }
+
+    /**
      * @param string $command
      * @param string|string[] $filter
      * @param array $options

@@ -141,10 +141,19 @@ class TaskManager
     }
 
     /**
+     * @param string|string[] $filter
+     * @return int
+     */
+    public function count($filter = null)
+    {
+        return $this->taskwarrior->count($filter);
+    }
+
+    /**
      * @param string|array $filter
      * @return Task[]|ArrayCollection
      */
-    public function filterPending($filter = null)
+    public function findPending($filter = null)
     {
         return $this->filter(array_merge((array)$filter, ['status:pending']));
     }
@@ -275,7 +284,7 @@ class TaskManager
      * @return Task[]|ArrayCollection
      * @throws Exception\ConfigException
      */
-    public function filterByReport($report)
+    public function findByReport($report)
     {
         if (!$report instanceof Report) {
             $report = $this->taskwarrior->config()->getReport($report);
@@ -292,9 +301,9 @@ class TaskManager
      * @return Task[]|ArrayCollection
      * @throws Exception\ConfigException
      */
-    public function filterByContext($context)
+    public function findByContext($context)
     {
-        if (!$context instanceof Report) {
+        if (!$context instanceof Context) {
             $context = $this->taskwarrior->config()->getContext($context);
         }
 
@@ -330,7 +339,7 @@ class TaskManager
             }
         };
 
-        $task = $factory->createProxy('DavidBadura\Taskwarrior\Task', $initializer);
+        $task = $factory->createProxy(Task::class, $initializer);
 
         return $this->tasks[$uuid] = $task;
     }
@@ -358,7 +367,7 @@ class TaskManager
         $json = $this->taskwarrior->export($filter);
 
         /** @var Task[] $tasks */
-        $tasks = $this->getSerializer()->deserialize($json, 'array<DavidBadura\Taskwarrior\Task>', 'json');
+        $tasks = $this->getSerializer()->deserialize($json, 'array<' . Task::class . '>', 'json');
 
         foreach ($tasks as $task) {
             if (!$task->getDependencies()) {
@@ -426,8 +435,8 @@ class TaskManager
      */
     private function setValue(Task $task, $attr, $value)
     {
-        $refClass = new \ReflectionClass('DavidBadura\Taskwarrior\Task');
-        $refProp  = $refClass->getProperty($attr);
+        $refClass = new \ReflectionClass(Task::class);
+        $refProp = $refClass->getProperty($attr);
         $refProp->setAccessible(true);
         $refProp->setValue($task, $value);
     }

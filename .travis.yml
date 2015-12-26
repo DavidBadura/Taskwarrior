@@ -18,7 +18,6 @@ cache:
     - build
 
 php:
-  - 5.4
   - 5.5
   - 5.6
   - 7
@@ -33,7 +32,6 @@ env:
 
 matrix:
   allow_failures:
-      - php: 7
       - php: hhvm
 
 install:
