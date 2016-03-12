@@ -25,17 +25,12 @@ php:
 
 env:
     global:
-      - TASKWARRIOR=2.5.1
+      - TASKWARRIOR=2.5.0
     matrix:
       - PREFER_LOWEST="--prefer-lowest"
       - PREFER_LOWEST=""
 
 matrix:
-  include:
-      - php: 7
-        env: TASKWARRIOR=2.5.0
-      - php: 5.6
-        env: TASKWARRIOR=2.5.0
   allow_failures:
       - php: hhvm
 
