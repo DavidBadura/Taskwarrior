@@ -2,6 +2,7 @@
 
 namespace DavidBadura\Taskwarrior\Test;
 
+use DavidBadura\Taskwarrior\Annotation;
 use DavidBadura\Taskwarrior\Recurring;
 use DavidBadura\Taskwarrior\Task;
 use DavidBadura\Taskwarrior\TaskManager;
@@ -926,6 +927,64 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1, $this->taskManager->count());
         $this->assertEquals(1, $this->taskManager->count('+bar'));
         $this->assertEquals(0, $this->taskManager->count('+baz'));
+    }
+
+    public function testEmptyAnnotation()
+    {
+        $task = new Task();
+        $task->setDescription('foo');
+
+        $this->taskManager->save($task);
+
+        $temp1 = $this->taskManager->find($task->getUuid());
+
+        $this->assertCount(0, $temp1->getAnnotations());
+    }
+
+    public function testAnnotation()
+    {
+        $task = new Task();
+        $task->setDescription('foo');
+        $task->addAnnotation(new Annotation('testbar'));
+
+        $this->taskManager->save($task);
+        $task = $this->taskManager->find($task->getUuid());
+
+        $annotations = $task->getAnnotations();
+        $this->assertCount(1, $annotations);
+        $this->assertEquals('testbar', $annotations[0]->getDescription());
+
+        $task->addAnnotation(new Annotation('blabla'));
+
+        $this->taskManager->save($task);
+        $task = $this->taskManager->find($task->getUuid());
+
+        $annotations = $task->getAnnotations();
+        $this->assertCount(2, $annotations);
+        $this->assertEquals('testbar', $annotations[0]->getDescription());
+        $this->assertEquals('blabla', $annotations[1]->getDescription());
+
+        $task->removeAnnotation($annotations[0]);
+        
+        $this->taskManager->save($task);
+        $task = $this->taskManager->find($task->getUuid());
+
+        $annotations = $task->getAnnotations();
+        $this->assertCount(1, $annotations);
+        $this->assertEquals('blabla', $annotations[0]->getDescription());
+
+        $task->setAnnotations([
+            new Annotation('foo'),
+            new Annotation('bar')
+        ]);
+
+        $this->taskManager->save($task);
+        $task = $this->taskManager->find($task->getUuid());
+
+        $annotations = $task->getAnnotations();
+        $this->assertCount(2, $annotations);
+        $this->assertEquals('foo', $annotations[0]->getDescription());
+        $this->assertEquals('bar', $annotations[1]->getDescription());
     }
 
     /**
