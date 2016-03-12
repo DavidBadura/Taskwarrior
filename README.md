@@ -21,7 +21,12 @@ Unfortunately, the annotation reader is not automatically registered on composer
 ## Requirements
 
 Taskwarrior changes its behavior by patch level updates and it is very difficult to support all versions.
-The current supported versions are: **>=2.4.3**
+The current supported versions are:
+
+|PHP Lib|Taskwarrior|PHP Version|
+|----|---------|------|
+|2.x|>=2.4.3|>=5.4|
+|3.x|>=2.5.0|>=5.5|
 
 ## Usage
 
@@ -29,6 +34,7 @@ The current supported versions are: **>=2.4.3**
 use DavidBadura\Taskwarrior\TaskManager;
 use DavidBadura\Taskwarrior\Task;
 use DavidBadura\Taskwarrior\Recurring;
+use DavidBadura\Taskwarrior\Annotation;
 
 $tm = TaskManager::create();
 
@@ -39,6 +45,7 @@ $task->setDue('tomorrow');
 $task->setPriority(Task::PRIORITY_HIGH);
 $task->addTag('next');
 $task->setRecurring(Recurring::DAILY);
+$task->addAnnotation(new Annotation("and add many features"));
 
 $tm->save($task);
 
@@ -65,6 +72,7 @@ $tasks = $tm->filterByReport('waiting'); // and sorting
 |due|true|DateTime|
 |wait|true|DateTime|
 |tags|true|string[]|
+|annotations|true|Annotation[]|
 |urgency|false|float|
 |entry|false|DateTime|
 |start|false|DateTime|
@@ -127,6 +135,15 @@ $tasks = $tm->filterPending('project:hobby and +home');
 $tasks = $tm->filterPending(['project:hobby', '+home']);
 ```
 
+count tasks:
+
+```php
+$tasks = $tm->count('status:pending');
+$tasks = $tm->count('status:pending +home');
+$tasks = $tm->count('status:pending and +home');
+$tasks = $tm->count(['status:pending', '+home']);
+```
+
 delete task:
 
 ```php
@@ -177,6 +194,22 @@ $tm->clear(); // clear object cache
 $task1 = $tm->find('uuid-from-task1');
 $task2 = $task1->getDependencies()[0];
 echo $task2->getDesciption(); // "b" <- lazy loading
+```
+
+annotations:
+
+```php
+$task = new Task();
+$task->setDescription('a');
+$task->addAnnotation(new Annotation("foobar"));
+
+$tm->save($task);
+
+$tm->clear(); // clear object cache
+
+$task = $tm->find('uuid-from-task1');
+$annotation = $task->getAnnotations()[0];
+echo $annotation->getDesciption(); // "foobar"
 ```
 
 ### QueryBuilder

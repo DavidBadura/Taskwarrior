@@ -965,7 +965,7 @@ class TaskManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('blabla', $annotations[1]->getDescription());
 
         $task->removeAnnotation($annotations[0]);
-        
+
         $this->taskManager->save($task);
         $task = $this->taskManager->find($task->getUuid());
 
