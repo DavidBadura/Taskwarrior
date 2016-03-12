@@ -207,4 +207,12 @@ class QueryBuilder
 
         return $result->matching($this->criteria);
     }
+
+    /**
+     * @return int
+     */
+    public function count()
+    {
+        return $this->taskManager->count($this->filter);
+    }
 }
