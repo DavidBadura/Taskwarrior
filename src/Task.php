@@ -111,7 +111,7 @@ class Task
      *
      * @JMS\Type("array<DavidBadura\Taskwarrior\Annotation>")
      */
-    private $annotations;
+    private $annotations = [];
 
     /**
      * @var Carbon
@@ -364,7 +364,7 @@ class Task
      */
     public function getAnnotations()
     {
-        return $this->annotations;
+        return (array)$this->annotations;
     }
 
     /**
@@ -394,8 +394,9 @@ class Task
      */
     public function removeAnnotation(Annotation $annotation)
     {
-        if ($key = array_search($annotation, $this->annotations)) {
+        if (false !== $key = array_search($annotation, $this->annotations)) {
             unset($this->annotations[$key]);
+            $this->annotations = array_values($this->annotations);
         }
     }
 

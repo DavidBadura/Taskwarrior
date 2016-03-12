@@ -25,6 +25,15 @@ class Annotation
     private $entry;
 
     /**
+     * @param string $description
+     */
+    public function __construct($description = null)
+    {
+        $this->entry = new Carbon(); // todo https://bug.tasktools.org/browse/TW-1780
+        $this->description = $description;
+    }
+
+    /**
      * @return string
      */
     public function getDescription()
