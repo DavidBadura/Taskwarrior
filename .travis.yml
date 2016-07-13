@@ -31,6 +31,8 @@ env:
     global:
       - TASKWARRIOR=2.5.1
       - GCC_VERSION=5
+      - CXX="g++-5"
+      - CC="gcc-5"
     matrix:
       - PREFER_LOWEST="--prefer-lowest"
       - PREFER_LOWEST=""
