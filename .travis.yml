@@ -25,10 +25,11 @@ php:
 
 env:
     global:
-      - TASKWARRIOR=2.5.0
+      - TASKWARRIOR=2.5.1
     matrix:
       - PREFER_LOWEST="--prefer-lowest"
       - PREFER_LOWEST=""
+      - TASKWARRIOR=2.5.0
 
 matrix:
   allow_failures:
@@ -36,8 +37,8 @@ matrix:
 
 install:
   - bash build.sh $TASKWARRIOR
+  - chmod +x build/taskwarrior-$TASKWARRIOR
   - ln -s build/taskwarrior-$TASKWARRIOR task
-  - chmod +x ./task
   - ./task --version
 
 before_script:
