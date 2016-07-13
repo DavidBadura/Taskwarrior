@@ -3,6 +3,8 @@ language: php
 addons:
   apt:
     packages:
+    - gcc-4.8
+    - g++-4.8
     - cmake
     - libgnutls-dev
     - libuuid1
