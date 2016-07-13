@@ -30,6 +30,7 @@ php:
 env:
     global:
       - TASKWARRIOR=2.5.1
+      - GCC_VERSION=5
     matrix:
       - PREFER_LOWEST="--prefer-lowest"
       - PREFER_LOWEST=""
