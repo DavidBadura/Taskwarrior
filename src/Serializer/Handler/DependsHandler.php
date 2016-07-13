@@ -73,12 +73,12 @@ class DependsHandler implements SubscribingHandlerInterface
             $list[] = $task->getUuid();
         }
 
-        return $visitor->visitArray($list, $type, $context);
+        return $visitor->visitString(implode(',', $list), $type, $context);
     }
 
     /**
      * @param VisitorInterface $visitor
-     * @param array $data
+     * @param string $data
      * @param array $type
      * @return ArrayCollection
      */
@@ -90,7 +90,7 @@ class DependsHandler implements SubscribingHandlerInterface
 
         $tasks = [];
 
-        foreach ($data as $uuid) {
+        foreach (explode(',', $data) as $uuid) {
             $tasks[] = $this->taskManager->getReference($uuid);
         }
 
