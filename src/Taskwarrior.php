@@ -62,6 +62,7 @@ class Taskwarrior
                 'rc:' . $this->taskrc,
                 'rc.data.location=' . $this->taskData,
                 'rc.json.array=true',
+                'rc.json.depends.array=true',
                 'rc.confirmation=no',
             ),
             $rcOptions
