@@ -15,7 +15,7 @@
         }
     ],
     "require": {
-        "php": ">=7.0",
+        "php": ">=7.4",
         "symfony/process": ">=2.5",
         "jms/serializer": "^1.0",
         "phpoption/phpoption": "^1.3",
