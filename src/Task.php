@@ -10,7 +10,7 @@ use JMS\Serializer\Annotation as JMS;
 /**
  * @author David Badura <d.a.badura@gmail.com>
  */
-class Task
+class Task implements \JsonSerializable
 {
     const STATUS_PENDING   = 'pending';
     const STATUS_COMPLETED = 'completed';
@@ -522,5 +522,25 @@ class Task
         $this->uuid   = null;
         $this->entry  = new Carbon('now');
         $this->status = self::STATUS_PENDING;
+    }
+
+    public function jsonSerialize()
+    {
+        $dateFormat = 'Y-m-d H:i:s';
+
+        return [
+            'uuid' => $this->uuid,
+            'description' => $this->description,
+            'priority' => $this->priority,
+            'project' => $this->project,
+            'due' => $this->due ? $this->due->format($dateFormat) : null,
+            'wait' => $this->wait ? $this->wait->format($dateFormat) : null,
+            'tags' => $this->tags ?: [],
+            'urgency' => $this->urgency,
+            'annotations' => array_map(
+                fn(Annotation $annotation) => ['entry' => $annotation->getEntry()->format($dateFormat), 'description' => $annotation->getDescription()],
+                $this->annotations
+            ),
+        ];
     }
 }

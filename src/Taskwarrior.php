@@ -253,7 +253,7 @@ class Taskwarrior
             $parts[] = $param;
         }
 
-        $process = new Process($this->createCommandLine($parts));
+        $process = Process::fromShellCommandline($this->createCommandLine($parts));
 
         if ($input) {
             $process->setInput($input);
