@@ -530,6 +530,7 @@ class Task implements \JsonSerializable
 
         return [
             'uuid' => $this->uuid,
+            'status' => $this->status,
             'description' => $this->description,
             'priority' => $this->priority,
             'project' => $this->project,
