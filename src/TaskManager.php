@@ -28,7 +28,7 @@ use ProxyManager\Proxy\ValueHolderInterface;
  */
 class TaskManager
 {
-    const PATTERN = '/^[\wäüö\.]*$/i';
+    const PATTERN = '/^[\wäüö\.@]*$/i';
 
     /**
      * @var Taskwarrior
