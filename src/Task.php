@@ -526,20 +526,18 @@ class Task implements \JsonSerializable
 
     public function jsonSerialize()
     {
-        $dateFormat = 'Y-m-d H:i:s';
-
         return [
             'uuid' => $this->uuid,
             'status' => $this->status,
             'description' => $this->description,
             'priority' => $this->priority,
             'project' => $this->project,
-            'due' => $this->due ? $this->due->format($dateFormat) : null,
-            'wait' => $this->wait ? $this->wait->format($dateFormat) : null,
+            'due' => $this->due ? $this->due->format(DATE_ATOM) : null,
+            'wait' => $this->wait ? $this->wait->format(DATE_ATOM) : null,
             'tags' => $this->tags ?: [],
             'urgency' => $this->urgency,
             'annotations' => array_map(
-                fn(Annotation $annotation) => ['entry' => $annotation->getEntry()->format($dateFormat), 'description' => $annotation->getDescription()],
+                fn(Annotation $annotation) => ['entry' => $annotation->getEntry()->format(DATE_ATOM), 'description' => $annotation->getDescription()],
                 $this->annotations
             ),
         ];
